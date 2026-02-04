@@ -24,7 +24,6 @@ let app, auth, db;
 
 if (isConfigValid) {
   try {
-    // Prevent double initialization in strict mode
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
     db = getFirestore(app);
@@ -33,6 +32,5 @@ if (isConfigValid) {
   }
 }
 
-// We use a safe ID for the database path
 export const appId = "manas-dual-site";
 export { auth, db };

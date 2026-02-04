@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
-import { auth, db, appId, isConfigValid } from './firebase';
+import { auth, isConfigValid } from './firebase';
 import { UI } from './constants';
-import ApartmentView from './components/GardenView'; // We use the file we named GardenView
-import OfficeView from './components/OfficeView';     // We use OfficeView here
+import GardenView from './components/GardenView'; 
+import OfficeView from './components/OfficeView';
 import { 
   Sun, Moon, X, AlertCircle, RefreshCcw, 
-  Instagram, Twitter, Mail, Phone, Linkedin, Github, Cpu, Code2, Terminal 
+  Instagram, Twitter, Mail, Phone, Linkedin, Github, Code2, Cpu, Terminal
 } from 'lucide-react';
 
 function App() {
-  const [view, setView] = useState('apartment'); 
+  const [view, setView] = useState('garden'); 
   const [isDarkMode, setIsDarkMode] = useState(false); 
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState(null);
@@ -45,10 +45,11 @@ function App() {
   };
 
   const themeColors = {
-    bg: isDarkMode ? (view === 'apartment' ? 'bg-[#0e0e11]' : 'bg-[#0a0a0c]') : 'bg-[#fdfbf7]',
-    textMain: isDarkMode ? 'text-zinc-200' : 'text-zinc-900',
-    navBg: isDarkMode ? 'bg-zinc-900/60 border-white/5' : 'bg-[#fdfbf7]/80 border-[#e6e4dc]',
-    border: isDarkMode ? 'border-white/5' : 'border-[#e6e4dc]'
+    // The specific warm cream from your screenshot
+    bg: isDarkMode ? (view === 'garden' ? 'bg-[#0e0e11]' : 'bg-[#0a0a0c]') : 'bg-[#F9F8F4]',
+    textMain: isDarkMode ? 'text-zinc-200' : 'text-[#1A1A1A]',
+    navBg: isDarkMode ? 'bg-zinc-900/60 border-white/5' : 'bg-white/80 border-[#E6E4DC]',
+    border: isDarkMode ? 'border-white/5' : 'border-[#E6E4DC]'
   };
 
   if (!isConfigValid) return <div className="p-10 font-mono text-red-500">CONFIG ERROR: CHECK .ENV</div>;
@@ -83,7 +84,7 @@ function App() {
           </div>
           <div className="flex items-center gap-6 self-end md:self-auto">
             <div className={`flex gap-2 p-1 rounded-xl ${isDarkMode ? 'bg-white/5' : 'bg-black/5'}`}>
-              <button onClick={() => setView('apartment')} className={`px-4 py-2 rounded-lg ${UI.label} transition-all ${view === 'apartment' ? (isDarkMode ? 'bg-white text-black shadow-lg' : 'bg-white text-black shadow-sm') : 'opacity-60'}`}>Apartment</button>
+              <button onClick={() => setView('garden')} className={`px-4 py-2 rounded-lg ${UI.label} transition-all ${view === 'garden' ? (isDarkMode ? 'bg-white text-black shadow-lg' : 'bg-white text-black shadow-sm') : 'opacity-60'}`}>Garden</button>
               <button onClick={() => setView('pro')} className={`px-4 py-2 rounded-lg ${UI.label} transition-all ${view === 'pro' ? (isDarkMode ? 'bg-white text-black shadow-lg' : 'bg-white text-black shadow-sm') : 'opacity-60'}`}>Office</button>
             </div>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-3 rounded-xl bg-black/5 dark:bg-white/5 hover:opacity-70 transition-opacity">
@@ -93,46 +94,62 @@ function App() {
         </nav>
 
         <main className="min-h-[600px]">
-          {view === 'apartment' ? (
-            <ApartmentView isAdmin={isAdmin} isDarkMode={isDarkMode} user={user} db={db} appId={appId} />
+          {view === 'garden' ? (
+            <GardenView isAdmin={isAdmin} isDarkMode={isDarkMode} />
           ) : (
-            <OfficeView isDarkMode={isDarkMode} db={db} appId={appId} />
+            <OfficeView isDarkMode={isDarkMode} />
           )}
         </main>
 
-        <footer className={`mt-48 pt-20 border-t ${themeColors.border} pb-32 transition-all`}>
-          <div className="flex flex-col md:flex-row justify-between items-start gap-20">
-            <div className="space-y-8">
-               <div className="flex items-center gap-4">
-                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${view === 'apartment' ? 'bg-emerald-600' : 'bg-indigo-600'}`}>
-                    <span className="text-white font-black italic text-lg">M</span>
-                 </div>
-                 <span className={`${UI.serif} text-2xl font-black tracking-tighter`}>Manas Sontakke</span>
-               </div>
-               <div className="flex gap-4 opacity-50">
-                  {view === 'apartment' ? (
-                    <>
-                      <a href="#" className="p-3 bg-zinc-100 dark:bg-white/5 rounded-xl hover:text-pink-600 transition-all"><Instagram className="w-5 h-5" /></a>
-                      <a href="#" className="p-3 bg-zinc-100 dark:bg-white/5 rounded-xl hover:text-sky-500 transition-all"><Twitter className="w-5 h-5" /></a>
-                      <a href="#" className="p-3 bg-zinc-100 dark:bg-white/5 rounded-xl hover:text-emerald-600 transition-all"><Mail className="w-5 h-5" /></a>
-                      <a href="#" className="p-3 bg-zinc-100 dark:bg-white/5 rounded-xl hover:text-green-600 transition-all"><Phone className="w-5 h-5" /></a>
-                    </>
-                  ) : (
-                    <>
-                      <a href="#" className="p-3 bg-zinc-100 dark:bg-white/5 rounded-xl hover:text-blue-600 transition-all"><Linkedin className="w-5 h-5" /></a>
-                      <a href="#" className="p-3 bg-zinc-100 dark:bg-white/5 rounded-xl hover:text-white transition-all"><Github className="w-5 h-5" /></a>
-                      <a href="#" className="p-3 bg-zinc-100 dark:bg-white/5 rounded-xl hover:text-indigo-600 transition-all"><Mail className="w-5 h-5" /></a>
-                    </>
-                  )}
-               </div>
+        <footer className={`mt-48 pt-16 border-t ${themeColors.border} pb-24`}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-4">
+            {/* Identity */}
+            <div className="space-y-4">
+              <span className={`${UI.serif} text-lg font-bold block`}>Manas Sontakke</span>
+              <p className={`${UI.sans} text-zinc-500 text-xs max-w-[200px]`}>
+                A digital archive and professional portfolio. Built with React & Firebase.
+              </p>
+              <p className={`${UI.mono} text-zinc-400`}>Kanpur, India</p>
             </div>
-            <div className="flex flex-col items-end gap-6">
-               <p className={`${UI.mono} opacity-40`}>IIT Kanpur // Class of 2026</p>
-               <div className={`inline-flex items-center gap-3 px-5 py-2 rounded-full border ${themeColors.border}`}>
-                  <div className={`w-2 h-2 rounded-full animate-pulse ${view === 'apartment' ? 'bg-emerald-500' : 'bg-indigo-500'}`} />
-                  <p className={UI.mono}>{user ? 'NODE_SECURE' : 'HANDSHAKE'}</p>
-               </div>
+
+            {/* Sitemap */}
+            <div className="space-y-4">
+              <span className={UI.mono}>SITEMAP</span>
+              <ul className={`space-y-2 ${UI.sans} text-zinc-500`}>
+                <li><button onClick={() => setView('garden')} className="hover:text-black dark:hover:text-white transition-colors">Digital Garden</button></li>
+                <li><button onClick={() => setView('pro')} className="hover:text-black dark:hover:text-white transition-colors">Professional Office</button></li>
+                <li><span className="opacity-50">RSS Feed (Coming Soon)</span></li>
+              </ul>
             </div>
+
+            {/* Connect */}
+            <div className="space-y-4">
+              <span className={UI.mono}>CONNECT</span>
+              <div className={`flex flex-col gap-2 ${UI.sans} text-zinc-500`}>
+                {view === 'garden' ? (
+                  <>
+                    <a href="#" className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"><Instagram className="w-3 h-3" /> Instagram</a>
+                    <a href="#" className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"><Twitter className="w-3 h-3" /> Twitter</a>
+                    <a href="mailto:manass@iitk.ac.in" className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"><Mail className="w-3 h-3" /> Email</a>
+                    <a href="#" className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"><Phone className="w-3 h-3" /> Phone</a>
+                  </>
+                ) : (
+                  <>
+                    <a href="#" className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"><Linkedin className="w-3 h-3" /> LinkedIn</a>
+                    <a href="#" className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"><Github className="w-3 h-3" /> GitHub</a>
+                    <a href="#" className="flex items-center gap-2 hover:text-black dark:hover:text-white transition-colors"><Mail className="w-3 h-3" /> Email</a>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="mt-16 pt-8 border-t border-black/5 dark:border-white/5 flex justify-between items-center opacity-40">
+             <p className={UI.mono}>© 2026 Manas Sontakke</p>
+             <div className="flex gap-4">
+               <Cpu className="w-4 h-4" />
+               <Terminal className="w-4 h-4" />
+               <Code2 className="w-4 h-4" />
+             </div>
           </div>
         </footer>
       </div>

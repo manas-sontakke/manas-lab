@@ -1,25 +1,29 @@
 export const UI = {
-  heading: 'font-black tracking-tighter leading-none uppercase italic',
+  // Editorial Serif for Headings (e.g. "Manas Sontakke", "Essays")
   serif: 'font-serif tracking-tight',
-  mono: 'font-mono uppercase tracking-[0.2em] text-[10px] font-bold',
-  sans: 'font-sans font-black uppercase tracking-widest text-[11px]'
+  // Clean Sans for body text
+  sans: 'font-sans leading-relaxed',
+  // Mono for dates and technical specs
+  mono: 'font-mono text-[10px] uppercase tracking-widest font-medium',
+  // Buttons and Tags
+  label: 'font-sans font-bold text-[11px] uppercase tracking-wide'
 };
 
 export const STATIC_BLOGS = [
   { 
     id: 's1', 
-    title: "The Discipline of Efficiency", 
-    date: "03 · 2026", 
+    title: "Demystifying the IITK Double Major", 
+    date: "03 · 2025", 
     readTime: "4 MIN", 
-    excerpt: "Why manual memory management teaches you more about software architecture than any framework.", 
-    content: "At IIT Kanpur, the pace is relentless. A digital garden is not just a blog; it is an environment for learning in public..." 
+    excerpt: "Navigating the academic rigour while maintaining a passion for core engineering. A look into the systems architecture of a degree.", 
+    content: "Static content placeholder." 
   },
   { 
     id: 's2', 
-    title: "Designing Digital Gardens", 
-    date: "02 · 2026", 
+    title: "The Review of Every Cafe in Kanpur", 
+    date: "02 · 2025", 
     readTime: "6 MIN", 
-    excerpt: "Moving away from static portfolios to living, breathing repositories of thought.", 
-    content: "The web was meant to be a garden, not a brochure. In this post I explore the philosophy of digital cultivation..." 
+    excerpt: "A data-driven analysis of caffeine intake versus coding output. Finding the perfect spot for deep work.", 
+    content: "Static content placeholder." 
   }
 ];
