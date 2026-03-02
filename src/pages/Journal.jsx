@@ -33,9 +33,9 @@ export default function Journal({ isAdmin, isDarkMode }) {
   }, []);
 
   const themeColors = {
-    card: 'bg-transparent',
-    textMain: isDarkMode ? 'text-zinc-100' : 'text-zinc-900',
-    textSub: isDarkMode ? 'text-zinc-400' : 'text-zinc-500',
+    modalBg: isDarkMode ? 'bg-[#0A0A0A]' : 'bg-[#F4F1EA]',
+    textMain: isDarkMode ? 'text-[#EDEDED]' : 'text-[#232323]',
+    textSub: isDarkMode ? 'text-zinc-500' : 'text-[#5A5A5A]',
     border: isDarkMode ? 'border-white/10' : 'border-black/10'
   };
 
@@ -99,22 +99,32 @@ export default function Journal({ isAdmin, isDarkMode }) {
 
   // --- RENDERING ---
 
-  // 1. READING MODAL
+  // 1. READING MODAL (Medium Style)
   if (selectedBlog) {
     return (
-      <div className="fixed inset-0 z-[150] flex flex-col p-0 md:p-12 backdrop-blur-sm bg-white/95 dark:bg-[#111111]/95 animate-in fade-in duration-300">
-        <div className={`w-full h-full md:max-w-[720px] mx-auto overflow-y-auto ${themeColors.card} relative outline-none z-20 custom-scrollbar`}>
-          <button onClick={() => setSelectedBlog(null)} className={`fixed top-6 right-6 md:absolute md:top-8 md:-right-16 p-3 rounded-full hover:rotate-90 transition-all z-50 ${isDarkMode ? 'bg-white text-black' : 'bg-[#1A1A1A] text-white'}`}><X className="w-4 h-4" /></button>
-          <div className="p-8 md:px-0 md:py-24 max-w-2xl mx-auto">
-            <div className={`mb-16 pb-8 flex items-center justify-between`}>
-              <div className="flex items-center gap-6 text-zinc-400"><span className={UI.mono}>{selectedBlog.date}</span><span className={UI.mono}>{selectedBlog.readTime}</span></div>
+      <div className={`fixed inset-0 z-[150] flex flex-col p-4 md:p-0 ${themeColors.modalBg} animate-in fade-in duration-300`}>
+        <div className={`w-full h-full md:max-w-[680px] mx-auto overflow-y-auto relative outline-none z-20 custom-scrollbar pb-32`}>
+          <button onClick={() => setSelectedBlog(null)} className={`fixed top-8 right-8 p-3 rounded-full hover:scale-110 transition-all z-50 text-zinc-400 hover:text-black dark:hover:text-white`}><X className="w-6 h-6" /></button>
+
+          <div className="pt-24 md:pt-32 pb-12 w-full">
+            <h1 className={`${UI.serif} text-4xl md:text-[3.2rem] mb-6 leading-[1.15] tracking-tight ${themeColors.textMain}`}>{selectedBlog.title}</h1>
+
+            <div className={`mb-16 pb-8 flex items-center justify-between border-b ${themeColors.border}`}>
+              <div className="flex items-center gap-4 text-zinc-500 text-[0.95rem] font-sans">
+                <span>{selectedBlog.date}</span>
+                <span>·</span>
+                <span>{selectedBlog.readTime}</span>
+              </div>
               {isAdmin && typeof selectedBlog.id === 'string' && !selectedBlog.id.startsWith('s') && (
-                <div className="flex gap-6"><button onClick={() => { startEditing(selectedBlog); setSelectedBlog(null); }} className={`${UI.mono} text-zinc-400 hover:text-black dark:hover:text-white transition-colors`}>EDIT</button><button onClick={() => deleteDocItem(selectedBlog.id)} className={`${UI.mono} text-red-500 hover:text-red-700 transition-colors`}>DELETE</button></div>
+                <div className="flex gap-6">
+                  <button onClick={() => { startEditing(selectedBlog); setSelectedBlog(null); }} className={`font-sans text-[0.95rem] text-zinc-400 hover:text-black dark:hover:text-white transition-colors`}>Edit Entry</button>
+                  <button onClick={() => deleteDocItem(selectedBlog.id)} className={`font-sans text-[0.95rem] text-red-500 hover:text-red-700 transition-colors`}>Delete</button>
+                </div>
               )}
             </div>
-            <h1 className={`${UI.heading} text-4xl md:text-[3.5rem] mb-12 leading-[1.1] tracking-tight ${themeColors.textMain}`}>{selectedBlog.title}</h1>
-            <div className={`${UI.serif} text-[1.15rem] space-y-8 ${themeColors.textMain} leading-[1.8]`}>
-              {selectedBlog.content ? selectedBlog.content.split('\n').map((p, i) => <p key={i} className="mb-6">{p}</p>) : <p>No content.</p>}
+
+            <div className={`${UI.serif} text-[1.25rem] md:text-[1.35rem] space-y-8 ${themeColors.textMain} leading-[1.8] tracking-[-0.01em]`}>
+              {selectedBlog.content ? selectedBlog.content.split('\n').map((p, i) => p.trim() !== '' ? <p key={i} className="mb-6">{p}</p> : null) : <p>No content.</p>}
             </div>
           </div>
         </div>
@@ -131,12 +141,12 @@ export default function Journal({ isAdmin, isDarkMode }) {
           <button onClick={() => setSubView('archive')} className={`${UI.mono} ${UI.linkHover} text-zinc-400`}>CANCEL</button>
         </div>
         <form onSubmit={handleSaveBlog} className="space-y-12">
-          <input type="text" placeholder="Title..." value={newBlog.title} onChange={e => setNewBlog({ ...newBlog, title: e.target.value })} className={`w-full text-4xl md:text-[3.5rem] ${UI.heading} tracking-tight bg-transparent border-none outline-none placeholder:opacity-20 ${themeColors.textMain}`} />
-          <textarea placeholder="Excerpt..." value={newBlog.excerpt} onChange={e => setNewBlog({ ...newBlog, excerpt: e.target.value })} className={`w-full p-0 bg-transparent text-lg ${UI.sans} outline-none resize-none h-24 ${themeColors.textSub} transition-all`} />
-          <textarea placeholder="Write..." value={newBlog.content} onChange={e => setNewBlog({ ...newBlog, content: e.target.value })} className={`w-full p-0 bg-transparent text-[1.15rem] font-serif leading-[1.8] outline-none h-[60vh] resize-none ${themeColors.textMain} custom-scrollbar`} />
-          <div className="flex justify-end border-t border-black/10 dark:border-white/10 pt-8">
-            <button disabled={isSubmitting} className={`px-8 py-3 bg-[#1A1A1A] dark:bg-white text-white dark:text-[#1A1A1A] ${UI.label} hover:opacity-80 transition-opacity`}>
-              {statusMsg === 'syncing' ? 'SYNCING...' : statusMsg === 'success' ? 'PUBLISHED' : 'PUBLISH'}
+          <input type="text" placeholder="Title..." value={newBlog.title} onChange={e => setNewBlog({ ...newBlog, title: e.target.value })} className={`w-full text-4xl md:text-[3.2rem] ${UI.serif} leading-[1.15] tracking-tight bg-transparent focus:bg-transparent border-none outline-none placeholder:opacity-20 ${themeColors.textMain}`} />
+          <textarea placeholder="Excerpt..." value={newBlog.excerpt} onChange={e => setNewBlog({ ...newBlog, excerpt: e.target.value })} className={`w-full p-0 bg-transparent focus:bg-transparent text-[1.1rem] ${UI.sans} outline-none resize-none h-24 ${themeColors.textSub} transition-all`} />
+          <textarea placeholder="Write your thoughts..." value={newBlog.content} onChange={e => setNewBlog({ ...newBlog, content: e.target.value })} className={`w-full p-0 bg-transparent focus:bg-transparent text-[1.25rem] md:text-[1.35rem] font-serif leading-[1.8] tracking-[-0.01em] outline-none h-[60vh] resize-none ${themeColors.textMain} custom-scrollbar`} />
+          <div className={`flex justify-end border-t ${themeColors.border} pt-8`}>
+            <button disabled={isSubmitting} className={`px-8 py-3 bg-[#1A1A1A] dark:bg-white text-white dark:text-[#1A1A1A] ${UI.label} hover:opacity-80 transition-opacity rounded-full`}>
+              {statusMsg === 'syncing' ? 'Publishing...' : statusMsg === 'success' ? 'Published' : 'Publish Entry'}
             </button>
           </div>
         </form>
