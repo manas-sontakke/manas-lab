@@ -32,8 +32,8 @@ export default function Profile({ isDarkMode }) {
       {/* Header Bio */}
       <section className="mb-24 mt-8 md:mt-16">
         <p className={`${UI.serif} text-[1.2rem] leading-[1.7] ${themeColors.textSub} max-w-xl`}>
-          Software Engineer and Undergraduate Researcher at IIT Kanpur. <br />
-          Specializing in high-performance systems and digital architecture.
+          A student at IIT Kanpur. <br />
+          Playing around with systems, code, and digital spaces.
         </p>
         <div className="flex gap-6 mt-8">
           <a href="https://github.com/manas-sontakke" target="_blank" className={`flex items-center gap-1.5 font-sans text-sm text-[#666666] ${UI.linkHover}`}><Github className="w-3.5 h-3.5" /> GitHub</a>
@@ -50,18 +50,18 @@ export default function Profile({ isDarkMode }) {
               <span className={`font-sans text-zinc-400 text-sm md:text-[0.95rem] w-32 shrink-0`}>2022 — 2026</span>
               <div>
                 <h4 className={`font-sans font-medium text-[0.95rem] md:text-[1rem] ${themeColors.textMain} mb-1`}>IIT Kanpur</h4>
-                <p className={`${UI.serif} text-[1.05rem] ${themeColors.textSub} leading-[1.6]`}>Bachelor of Technology in Comp Science. Researching efficiency.</p>
+                <p className={`${UI.serif} text-[1.05rem] ${themeColors.textSub} leading-[1.6]`}>B.Tech in Computer Science. Mostly trying to figure out how things work.</p>
               </div>
             </div>
           </div>
         </section>
 
         <section>
-          <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>SELECTED WORK</h3>
+          <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>PROJECTS</h3>
           <div className={`flex flex-col bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 rounded-xl p-2 md:p-4 shadow-sm`}>
             {[
-              { title: "Merge Optimization", desc: "Efficiency-first implementation of array logic with O(1) space." },
-              { title: "Garden Engine", desc: "Real-time sync engine for collaborative archives." }
+              { title: "Merge Optimization", desc: "A side project experimenting with array logic and space efficiency." },
+              { title: "Personal Archive", desc: "A simple space for writing and keeping track of things." }
             ].map((proj, idx) => (
               <div key={proj.title} className={`group py-5 px-4 flex flex-col gap-1 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors rounded-lg ${idx !== 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-5 mb-1' : ''}`}>
                 <h4 className={`font-sans font-medium text-[0.95rem] md:text-[1rem] ${themeColors.textMain} flex items-center gap-2 group-hover:opacity-70 transition-opacity`}>
