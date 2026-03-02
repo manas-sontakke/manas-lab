@@ -9,6 +9,7 @@ This isn't meant to be a flashy portfolio to prove competence; it's mostly just 
 - **Styling**: Tailwind CSS 
 - **Database / Auth**: Firebase 
 - **Deployment**: Vercel
+- **Live URL**: [https://manas-lab.vercel.app](https://manas-lab.vercel.app)
 
 ### Local Setup
 1. Clone the repository

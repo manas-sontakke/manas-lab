@@ -98,21 +98,36 @@ function App() {
           )}
         </main>
 
-        <footer className={`mt-48 pt-12 border-t ${themeColors.border} pb-12 flex flex-col md:flex-row justify-between items-center gap-6`}>
-          <div className="flex gap-8">
-            <a href="https://github.com/manas-sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>GITHUB</a>
-            <a href="https://linkedin.com/in/manas-sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>LINKEDIN</a>
-            <a href="mailto:manass@iitk.ac.in" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>EMAIL</a>
+        <footer className={`mt-48 pt-12 border-t ${themeColors.border} pb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-12 md:gap-6`}>
+          <div className="flex flex-col gap-6">
+            <div className="flex gap-8">
+              <a href="https://github.com/manas-sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>GITHUB</a>
+              <a href="https://linkedin.com/in/manas-sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>LINKEDIN</a>
+              <a href="mailto:manass@iitk.ac.in" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>EMAIL</a>
+            </div>
+            <p className={`${UI.serif} text-zinc-500 text-sm max-w-sm leading-relaxed`}>
+              This digital space is built using React, structured with Tailwind, and synced via Firebase. Deployed gracefully on Vercel.
+            </p>
           </div>
-          <div className="flex items-center gap-6">
-            <p className={`${UI.mono} text-zinc-400`}>© 2026 MANAS SONTAKKE</p>
-            <button
-              onClick={() => isAdmin ? setIsAdmin(false) : setShowAuthModal(true)}
-              className={`text-zinc-400 ${UI.linkHover} transition-colors ${isAdmin ? 'text-emerald-500 hover:text-emerald-600' : ''}`}
-              title={isAdmin ? "Log Out" : "System Access"}
-            >
-              <Terminal className="w-3.5 h-3.5" />
-            </button>
+          <div className="flex flex-col items-start md:items-end gap-2">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span className={`${UI.mono} text-zinc-400`}>SYSTEM ONLINE</span>
+              </div>
+              <button
+                onClick={() => isAdmin ? setIsAdmin(false) : setShowAuthModal(true)}
+                className={`text-zinc-400 ${UI.linkHover} transition-colors ${isAdmin ? 'text-emerald-500 hover:text-emerald-600' : ''}`}
+                title={isAdmin ? "Log Out" : "System Access"}
+              >
+                <Terminal className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <p className={`${UI.mono} text-zinc-400 mt-4`}>© 2026 MANAS SONTAKKE</p>
+            <p className={`${UI.mono} text-zinc-500 text-[10px]`}>KANPUR, INDIA</p>
           </div>
         </footer>
       </div>
