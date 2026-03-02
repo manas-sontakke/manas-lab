@@ -1,20 +1,44 @@
-<<<<<<< HEAD
-# React + Vite
+# Manas Sontakke — Digital Archive
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A high-performance, minimalist digital portfolio and journal built by [Manas Sontakke](https://linkedin.com/in/manas-sontakke).
 
-Currently, two official plugins are available:
+Designed for absolute clarity, brutalist typography, and mathematical spacing inspired by the analog precision of print publishing.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Stack
+- **Framework**: React + Vite
+- **Styling**: Tailwind CSS (Strictly custom token driven)
+- **Database / Auth**: Firebase (Firestore & Custom Auth via Admin Key)
+- **Deployment**: Vercel
 
-## React Compiler
+### Architecture
+Designed to separate raw content (Journal) from structural representation (Profile):
+```
+src/
+├── pages/
+│   ├── Journal.jsx    # The living digital archive & writing engine
+│   └── Profile.jsx     # The structured professional representation
+├── services/
+│   └── firebase.js   # Admin Auth & Firestore logic
+└── utils/
+    └── constants.js  # Global Typography (UI) & Design Tokens
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Local Setup
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up a `.env` file at the root matching the Firebase architecture.
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-## Expanding the ESLint configuration
+### Design Philosophy
+1. **Focus over Flash**: Subtle #F4F1EA beige tones rather than stark white.
+2. **Typography Guided**: Heavy reliance on `Newsreader` (serif), `Inter` (sans), and `JetBrains Mono`.
+3. **Card Modularity**: Elements subtly float with 0.05 opacity borders for visual separation without clutter.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# PersonalLandingPage
->>>>>>> 3ab018a3cbd7f12f4177a356cddce28fa7963df4
+---
+*© 2026 Manas Sontakke. Undergraduate Researcher at IIT Kanpur.*
