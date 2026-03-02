@@ -98,36 +98,57 @@ function App() {
           )}
         </main>
 
-        <footer className={`mt-48 pt-12 border-t ${themeColors.border} pb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-12 md:gap-6`}>
-          <div className="flex flex-col gap-6">
-            <div className="flex gap-8">
-              <a href="https://github.com/manas-sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>GITHUB</a>
-              <a href="https://linkedin.com/in/manas-sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>LINKEDIN</a>
-              <a href="mailto:manass@iitk.ac.in" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>EMAIL</a>
-            </div>
-            <p className={`${UI.serif} text-zinc-500 text-sm max-w-sm leading-relaxed`}>
-              This digital space is built using React, structured with Tailwind, and synced via Firebase. Deployed gracefully on Vercel.
-            </p>
+        <footer className={`mt-48 pt-12 border-t ${themeColors.border} pb-12 flex flex-col items-center md:items-start justify-between gap-12`}>
+          {/* Reangdeba Style Contact Card */}
+          <div className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#111111] shadow-sm mb-8">
+            <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain}`}>Have something to say? Send me an email.</span>
+            <a href="mailto:sontakke.manas@gmail.com" className="mt-4 md:mt-0 px-6 py-2.5 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-sans font-medium transition-colors">
+              Email me →
+            </a>
           </div>
-          <div className="flex flex-col items-start md:items-end gap-2">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span className={`${UI.mono} text-zinc-400`}>SYSTEM ONLINE</span>
+
+          <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-12 md:gap-6">
+            <div className="flex flex-col gap-6 w-full md:w-auto">
+              <div className="flex justify-center md:justify-start gap-8">
+                {view === 'journal' ? (
+                  <>
+                    <a href="https://twitter.com/manas_sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>TWITTER</a>
+                    <a href="https://instagram.com/manas_sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>INSTAGRAM</a>
+                    <a href="mailto:sontakke.manas@gmail.com" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>EMAIL</a>
+                    <a href="#" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>RSS</a>
+                  </>
+                ) : (
+                  <>
+                    <a href="https://github.com/manas-sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>GITHUB</a>
+                    <a href="https://linkedin.com/in/manas-sontakke" target="_blank" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>LINKEDIN</a>
+                    <a href="mailto:sontakke.manas@gmail.com" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>EMAIL</a>
+                  </>
+                )}
               </div>
-              <button
-                onClick={() => isAdmin ? setIsAdmin(false) : setShowAuthModal(true)}
-                className={`text-zinc-400 ${UI.linkHover} transition-colors ${isAdmin ? 'text-emerald-500 hover:text-emerald-600' : ''}`}
-                title={isAdmin ? "Log Out" : "System Access"}
-              >
-                <Terminal className="w-3.5 h-3.5" />
-              </button>
+              <p className={`${UI.serif} text-zinc-500 text-sm max-w-sm leading-relaxed text-center md:text-left`}>
+                This digital space is built using React, structured with Tailwind, and synced via Firebase. Deployed gracefully on Vercel.
+              </p>
             </div>
-            <p className={`${UI.mono} text-zinc-400 mt-4`}>© 2026 MANAS SONTAKKE</p>
-            <p className={`${UI.mono} text-zinc-500 text-[10px]`}>KANPUR, INDIA</p>
+            <div className="flex flex-col items-start md:items-end gap-2">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  </span>
+                  <span className={`${UI.mono} text-zinc-400`}>SYSTEM ONLINE</span>
+                </div>
+                <button
+                  onClick={() => isAdmin ? setIsAdmin(false) : setShowAuthModal(true)}
+                  className={`text-zinc-400 ${UI.linkHover} transition-colors ${isAdmin ? 'text-emerald-500 hover:text-emerald-600' : ''}`}
+                  title={isAdmin ? "Log Out" : "System Access"}
+                >
+                  <Terminal className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <p className={`${UI.mono} text-zinc-400 mt-4`}>© 2026 MANAS SONTAKKE</p>
+              <p className={`${UI.mono} text-zinc-500 text-[10px]`}>KANPUR, INDIA</p>
+            </div>
           </div>
         </footer>
       </div>

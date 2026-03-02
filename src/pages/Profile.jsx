@@ -72,21 +72,6 @@ export default function Profile({ isDarkMode }) {
             ))}
           </div>
         </section>
-
-        <section>
-          <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>CONTACT</h3>
-          <div className={`bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 rounded-xl p-6 md:p-8 shadow-sm`}>
-            <form onSubmit={submitContact} className="space-y-6 w-full max-w-xl">
-              <input type="email" placeholder="Email Address" value={contactData.email} onChange={e => setContactData({ ...contactData, email: e.target.value })} className={`w-full p-2 bg-transparent border-b border-black/10 dark:border-white/10 outline-none font-sans text-[0.95rem] focus:border-black dark:focus:border-white transition-colors placeholder:text-zinc-400 ${themeColors.textMain}`} />
-              <textarea placeholder="Your Message" value={contactData.message} onChange={e => setContactData({ ...contactData, message: e.target.value })} className={`w-full p-2 bg-transparent border-b border-black/10 dark:border-white/10 outline-none font-sans text-[0.95rem] h-24 resize-none focus:border-black dark:focus:border-white transition-colors placeholder:text-zinc-400 ${themeColors.textMain}`} />
-              <div className="flex justify-start pt-4">
-                <button disabled={contactStatus === 'sending'} className={`px-6 py-2 bg-[#1A1A1A] dark:bg-white text-white dark:text-[#1A1A1A] font-sans text-xs font-medium uppercase tracking-wider rounded-full hover:opacity-80 transition-opacity`}>
-                  {contactStatus === 'sending' ? 'Sending...' : contactStatus === 'success' ? 'Sent' : 'Send Message'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
       </div>
     </div>
   );
