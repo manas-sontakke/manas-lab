@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
 import { auth, isConfigValid } from './services/firebase';
 import { UI } from './utils/constants';
 import Journal from './pages/Journal'; // Maps to "Indoor"
@@ -41,6 +41,17 @@ function App() {
         }
       }
     });
+    // Handle Redirect Result for Mobile
+    getRedirectResult(auth).then((result) => {
+      if (result) {
+        setShowAuthModal(false);
+        setAuthError(false);
+      }
+    }).catch((error) => {
+      console.error("[App Auth] Redirect Sign-In failed.", error);
+      setAuthError(true);
+      setTimeout(() => setAuthError(false), 3000);
+    });
 
     return () => unsubscribe();
   }, []);
@@ -50,11 +61,10 @@ function App() {
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-      await signInWithPopup(auth, provider);
-      setShowAuthModal(false);
-      setAuthError(false);
+      // Using redirect for better mobile browser compatibility
+      await signInWithRedirect(auth, provider);
     } catch (err) {
-      console.error("[App Auth] Google Sign-In failed.", err);
+      console.error("[App Auth] Google Sign-In init failed.", err);
       setAuthError(true);
       setTimeout(() => setAuthError(false), 3000);
     }
