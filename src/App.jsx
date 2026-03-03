@@ -101,13 +101,6 @@ function App() {
 
               <form onSubmit={handleAuth} className="space-y-6">
                 <div className="space-y-4">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email address..."
-                    className={`w-full bg-black/[0.02] dark:bg-white/[0.04] border border-black/5 dark:border-white/10 rounded-xl px-4 py-3 outline-none focus:border-black/20 dark:focus:border-white/20 transition-colors ${UI.sans} ${themeColors.textMain}`}
-                  />
                   <div>
                     <input
                       type="password"
@@ -122,7 +115,7 @@ function App() {
                 </div>
                 <div className="flex items-center justify-between">
                   <button type="button" onClick={handleForgotPassword} className="text-xs font-medium text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 transition-colors">
-                    {resetSent ? 'Recovery Email Sent' : 'Forgot Password?'}
+                    {resetSent ? 'Recovery Email Sent to manas_sontakke...' : 'Forgot Password?'}
                   </button>
                   <button type="submit" className={`flex items-center gap-2 ${UI.label} px-5 py-2.5 bg-[#1A1A1A] dark:bg-white/10 text-white dark:text-zinc-200 hover:opacity-80 transition-opacity rounded-lg`}>
                     <Lock className="w-3.5 h-3.5" /> Login
