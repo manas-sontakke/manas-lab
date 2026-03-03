@@ -109,14 +109,11 @@ function App() {
             onClick={() => {
               signOut(auth).then(() => { setIsAdmin(false); setView('journal'); });
             }}
-            className="group fixed left-0 top-0 bottom-0 w-8 md:w-10 bg-[#1A1A1A]/5 dark:bg-[#1A1A1A]/50 hover:bg-[#1A1A1A]/10 dark:hover:bg-[#1A1A1A]/80 border-r border-[#1A1A1A]/10 dark:border-white/5 flex flex-col items-center justify-center z-[150] shadow-[10px_0_30px_rgba(0,0,0,0.03)] dark:shadow-none backdrop-blur-sm transition-all duration-500 hover:w-10 md:hover:w-12 cursor-pointer"
+            className="fixed bottom-6 left-6 z-[150] flex items-center gap-3 px-5 py-2.5 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 border border-red-500/20 backdrop-blur-md shadow-lg group"
             title="Click to exit Admin Mode"
           >
-            <span className={`[writing-mode:vertical-lr] rotate-180 uppercase text-[10px] md:text-[11px] tracking-[0.2em] font-mono font-semibold flex items-center gap-3 transition-colors ${isDarkMode ? 'text-zinc-500 group-hover:text-zinc-300' : 'text-zinc-500 group-hover:text-zinc-800'}`}>
-              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDarkMode ? 'bg-zinc-400 group-hover:bg-red-400' : 'bg-zinc-500 group-hover:bg-red-500'}`} />
-              <span className="group-hover:hidden transition-all">ADMIN MODE</span>
-              <span className="hidden group-hover:block transition-all text-red-500 max-h-0 group-hover:max-h-[200px] overflow-hidden">EXIT SYSTEM</span>
-            </span>
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500 group-hover:bg-white animate-pulse transition-colors" />
+            <span className="font-mono text-[11px] font-bold tracking-widest uppercase">EXIT SYSTEM</span>
           </button>
         )}
 

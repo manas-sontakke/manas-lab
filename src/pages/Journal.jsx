@@ -120,18 +120,18 @@ export default function Journal({ isAdmin, isDarkMode }) {
     <div className="relative w-full">
       {/* 1. READING MODAL (Floating Overlay) */}
       {selectedBlog && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-0 md:p-8 lg:p-12 bg-black/10 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className={`w-full h-full md:max-h-[92vh] max-w-[760px] mx-auto bg-white dark:bg-[#1E1E1E] md:border border-black/5 dark:border-white/10 md:rounded-[2rem] p-8 md:p-16 lg:p-20 shadow-2xl overflow-y-auto custom-scrollbar relative animate-in zoom-in-[0.98] slide-in-from-bottom-4 duration-400 ease-out`}>
-            <button onClick={() => setSelectedBlog(null)} className={`fixed md:absolute top-4 right-4 md:top-8 md:right-8 p-3 md:p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors z-[60] text-zinc-400 hover:text-black dark:hover:text-white bg-white/80 dark:bg-[#1A1A1A]/80 backdrop-blur-md md:bg-white md:dark:bg-[#1A1A1A]`}>
-              <X className="w-5 h-5" />
+        <div className="fixed inset-0 z-[200] bg-[#F4F1EA] dark:bg-[#151515] overflow-y-auto animate-in fade-in slide-in-from-bottom-8 duration-500 custom-scrollbar">
+          <div className="w-full max-w-[760px] mx-auto px-6 md:px-12 py-24 md:py-32 relative min-h-screen flex flex-col">
+            <button onClick={() => setSelectedBlog(null)} className={`fixed top-6 right-6 md:top-12 md:right-12 p-3 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors z-[60] text-zinc-400 hover:text-black dark:hover:text-white`}>
+              <X className="w-6 h-6 md:w-8 md:h-8" />
             </button>
 
-            <h1 className={`${UI.serif} text-3xl md:text-[2.8rem] mb-6 mt-8 md:mt-4 leading-[1.15] tracking-tight ${themeColors.textMain}`}>
+            <h1 className={`${UI.serif} text-4xl md:text-[3.2rem] mb-6 mt-4 leading-[1.15] tracking-tight ${themeColors.textMain}`}>
               {selectedBlog.title}
             </h1>
 
-            <div className={`mb-10 pb-6 flex items-center justify-between border-b border-black/5 dark:border-white/5`}>
-              <div className="flex items-center gap-4 text-zinc-500 text-[0.85rem] font-sans">
+            <div className={`mb-12 pb-8 flex items-center justify-between border-b border-black/5 dark:border-white/5`}>
+              <div className="flex items-center gap-4 text-zinc-500 text-[0.9rem] font-sans">
                 <span>{selectedBlog.date}</span>
                 <span>·</span>
                 <span>{selectedBlog.readTime}</span>
@@ -144,8 +144,8 @@ export default function Journal({ isAdmin, isDarkMode }) {
               )}
             </div>
 
-            <div className={`${UI.serif} text-[1.15rem] md:text-[1.25rem] space-y-6 ${themeColors.textMain} leading-[1.7] tracking-[-0.01em]`}>
-              {selectedBlog.content ? selectedBlog.content.split('\n').map((p, i) => p.trim() !== '' ? <p key={i} className="mb-6">{p}</p> : null) : <p>No content.</p>}
+            <div className={`${UI.serif} text-[1.2rem] md:text-[1.35rem] space-y-8 ${themeColors.textMain} leading-[1.75] tracking-[-0.01em] pb-32 flex-grow`}>
+              {selectedBlog.content ? selectedBlog.content.split('\n').map((p, i) => p.trim() !== '' ? <p key={i}>{p}</p> : null) : <p>No content.</p>}
             </div>
           </div>
         </div>
