@@ -51,7 +51,7 @@ export default function Profile({ isDarkMode }) {
       <div className="space-y-12">
         <section>
           <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>EXPERIENCE</h3>
-          <div className={`flex flex-col bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/10 rounded-xl p-6 md:p-8 shadow-sm`}>
+          <div className={`flex flex-col glass-texture border border-black/5 dark:border-white/10 rounded-xl p-6 md:p-8 shadow-sm`}>
             {(content?.experience || []).map((exp, idx) => (
               <div key={exp.id || idx} className={`flex flex-col md:flex-row gap-2 md:gap-8 items-start md:items-baseline ${idx !== 0 ? 'mt-8 pt-8 border-t border-black/5 dark:border-white/5' : ''}`}>
                 <span className={`font-sans text-zinc-400 text-sm md:text-[0.95rem] w-32 shrink-0`}>{exp.years}</span>
@@ -66,7 +66,7 @@ export default function Profile({ isDarkMode }) {
 
         <section>
           <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>PROJECTS</h3>
-          <div className={`flex flex-col bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/10 rounded-xl p-2 md:p-4 shadow-sm`}>
+          <div className={`flex flex-col glass-texture border border-black/5 dark:border-white/10 rounded-xl p-2 md:p-4 shadow-sm`}>
             {(content?.projects || []).map((proj, idx) => (
               <div key={proj.id || idx} className={`group py-5 px-4 flex flex-col gap-1 cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors rounded-lg ${idx !== (content?.projects?.length || 1) - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-5 mb-1' : ''}`}>
                 <h4 className={`font-sans font-medium text-[0.95rem] md:text-[1rem] ${themeColors.textMain} flex items-center gap-2 group-hover:opacity-70 transition-opacity`}>

@@ -50,7 +50,7 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
 
     const inputClasses = `w-full bg-transparent border-b border-black/10 dark:border-white/10 focus:border-black dark:focus:border-white outline-none py-2 ${themeColors.textMain} ${UI.sans} transition-colors`;
     const labelClasses = `${UI.mono} text-zinc-400 mb-2 block`;
-    const cardClasses = `flex flex-col bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/10 rounded-2xl p-6 shadow-sm mb-8`;
+    const cardClasses = `flex flex-col glass-texture border border-black/5 dark:border-white/10 rounded-2xl p-6 shadow-sm mb-8`;
 
     return (
         <div className="animate-in fade-in duration-700 w-full mb-12">

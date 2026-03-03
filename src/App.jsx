@@ -91,7 +91,7 @@ function App() {
               <div className="mb-8">
                 <Terminal className={`w-6 h-6 mb-4 ${themeColors.textMain}`} />
                 <h2 className={`${UI.serif} text-2xl tracking-tight ${themeColors.textMain}`}>System Access</h2>
-                <p className={`${UI.sans} text-sm text-zinc-500 mt-2`}>Hey friend! This console is just for Manas to tend his digital garden. Need to reach him? The email link below is a better bet!</p>
+                <p className={`${UI.sans} text-sm text-zinc-500 mt-2`}>Hey! This console is just for me to tend my digital garden. If you want to connect, the email link below is a much better bet :)</p>
               </div>
 
               <form onSubmit={handleAuth} className="space-y-6">
@@ -125,7 +125,7 @@ function App() {
         {/* --- Modular Diagonal Pattern Background --- */}
         {/* Can be easily removed or disabled by commenting out this div. Hidden on mobile, subtle on desktop. */}
         <div
-          className="hidden lg:block fixed inset-0 z-0 pointer-events-none opacity-[0.015] dark:opacity-[0.02]"
+          className="hidden lg:block fixed inset-0 z-0 pointer-events-none opacity-[0.06] dark:opacity-[0.08]"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             backgroundAttachment: 'fixed' // Parallax effect
@@ -150,13 +150,19 @@ function App() {
                 <button onClick={() => setView('profile')} className={`${UI.label} transition-colors ${view === 'profile' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Profile</button>
               </div>
               <div className="w-px h-4 bg-zinc-300 dark:bg-zinc-800"></div>
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className="text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
-                {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className={`relative w-[48px] h-[24px] rounded-full flex items-center shadow-inner transition-colors border ${isDarkMode ? 'bg-[#151515] border-white/10' : 'bg-black/5 border-black/10'}`}
+                aria-label="Toggle Theme"
+              >
+                <div className={`absolute left-1 w-[16px] h-[16px] rounded-full flex items-center justify-center transition-transform duration-300 ease-in-out ${isDarkMode ? 'transform translate-x-[24px] bg-white text-black' : 'bg-white text-black drop-shadow-sm'}`}>
+                  {isDarkMode ? <Moon className="w-[10px] h-[10px]" /> : <Sun className="w-[10px] h-[10px]" />}
+                </div>
               </button>
             </div>
           </nav>
 
-          <main className="w-full min-h-[50vh]">
+          <main key={view} className="w-full min-h-[50vh] animate-in fade-in slide-in-from-bottom-2 duration-500 will-change-transform">
             {view === 'dashboard' && isAdmin ? (
               <AdminDashboard themeColors={themeColors} isDarkMode={isDarkMode} />
             ) : view === 'journal' ? (
