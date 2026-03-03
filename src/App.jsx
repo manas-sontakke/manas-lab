@@ -134,14 +134,14 @@ function App() {
         <div className={`fixed inset-0 z-[190] pointer-events-none transition-all duration-1000 ${isAdmin ? 'bg-emerald-500/0 mix-blend-overlay' : 'bg-black/0'}`} />
 
         <div className="relative max-w-[640px] mx-auto px-6 py-16 md:py-24">
-          <nav className={`flex justify-between items-center mb-20 gap-4 z-50 transition-all px-6 py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'}`}>
-            <div className="cursor-default select-none shrink-0">
+          <nav className={`flex justify-between items-center mb-20 gap-2 md:gap-4 z-50 transition-all px-4 md:px-6 py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'}`}>
+            <div className="cursor-default select-none shrink-0 truncate max-w-[120px] md:max-w-none">
               <div className="flex items-center gap-3">
-                <span className={`font-sans font-semibold text-lg tracking-tight`} onClick={() => setView('journal')}>Manas Sontakke</span>
+                <span className={`font-sans font-semibold text-lg md:text-lg tracking-tight`} onClick={() => setView('journal')}>Manas Sontakke</span>
               </div>
             </div>
-            <div className="flex items-center gap-6 relative z-10">
-              <div className={`flex gap-4`}>
+            <div className="flex items-center gap-3 md:gap-6 relative z-10 shrink-0">
+              <div className={`flex gap-3 md:gap-4`}>
                 {isAdmin && (
                   <button onClick={() => setView('dashboard')} className={`${UI.label} transition-colors ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Dashboard</button>
                 )}
