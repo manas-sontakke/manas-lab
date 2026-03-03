@@ -26,7 +26,9 @@ function App() {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
           await signInWithCustomToken(auth, __initial_auth_token);
         } else { await signInAnonymously(auth); }
-      } catch (e) { console.error(e); }
+      } catch (e) {
+        console.error("[App Auth] Firebase initialization/sign-in error:", e);
+      }
     };
     init();
     return onAuthStateChanged(auth, setUser);
@@ -39,6 +41,7 @@ function App() {
       setShowAuthModal(false);
       setAdminKey('');
     } else {
+      console.warn("[App Auth] Invalid admin key attempt.");
       setAuthError(true);
       setTimeout(() => setAuthError(false), 2000);
     }
@@ -55,7 +58,7 @@ function App() {
   if (!isConfigValid) return <div className="p-10 font-mono text-red-500">CONFIG ERROR: CHECK .ENV</div>;
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 font-sans ${themeColors.bg} ${themeColors.textMain} selection:bg-black selection:text-white`}>
+    <div className={`min-h-screen transition-colors duration-500 font-sans ${themeColors.bg} ${themeColors.textMain} selection:bg-black selection:text-white ${isDarkMode ? 'dark' : ''}`}>
 
       {showAuthModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 backdrop-blur-md bg-white/60 dark:bg-black/80 animate-in fade-in">
@@ -90,7 +93,7 @@ function App() {
           </div>
         </nav>
 
-        <main className="min-h-[60vh]">
+        <main className="w-full">
           {view === 'journal' ? (
             <Journal isAdmin={isAdmin} isDarkMode={isDarkMode} />
           ) : (
@@ -98,9 +101,9 @@ function App() {
           )}
         </main>
 
-        <footer className={`mt-48 pt-12 border-t ${themeColors.border} pb-12 flex flex-col items-center md:items-start justify-between gap-12`}>
+        <footer className={`mt-16 pt-10 border-t ${themeColors.border} pb-12 flex flex-col items-center md:items-start justify-between gap-12`}>
           {/* Reangdeba Style Contact Card */}
-          <div className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#1A1A1A] shadow-sm mb-8">
+          <div className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-transparent shadow-sm mb-8">
             <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain}`}>Have something to say? Send me an email.</span>
             <a href="mailto:sontakke.manas@gmail.com" className="mt-4 md:mt-0 px-6 py-2.5 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-sans font-medium transition-colors">
               Email me →

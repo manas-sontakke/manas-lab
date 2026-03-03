@@ -17,7 +17,10 @@ export default function Profile({ isDarkMode }) {
       setContactStatus('success');
       setContactData({ name: '', email: '', message: '' });
       setTimeout(() => setContactStatus(null), 3000);
-    } catch (err) { setContactStatus('error'); }
+    } catch (err) {
+      console.error("[Profile] Error submitting contact form:", err);
+      setContactStatus('error');
+    }
   };
 
   const themeColors = {
@@ -27,10 +30,10 @@ export default function Profile({ isDarkMode }) {
   };
 
   return (
-    <div className="animate-in fade-in duration-700 w-full pb-32">
+    <div className="animate-in fade-in duration-700 w-full pb-12">
 
       {/* Header Bio */}
-      <section className="mb-24 mt-8 md:mt-16">
+      <section className="mb-12 mt-4 md:mt-8">
         <p className={`${UI.serif} text-[1.2rem] leading-[1.7] ${themeColors.textSub} max-w-xl`}>
           A student at IIT Kanpur. <br />
           Playing around with systems, code, and digital spaces.
@@ -45,7 +48,7 @@ export default function Profile({ isDarkMode }) {
       <div className="space-y-12">
         <section>
           <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>EXPERIENCE</h3>
-          <div className={`flex flex-col bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 rounded-xl p-6 md:p-8 shadow-sm`}>
+          <div className={`flex flex-col bg-white dark:bg-transparent border border-black/5 dark:border-white/10 rounded-xl p-6 md:p-8 shadow-sm`}>
             <div className="flex flex-col md:flex-row gap-2 md:gap-8 items-start md:items-baseline">
               <span className={`font-sans text-zinc-400 text-sm md:text-[0.95rem] w-32 shrink-0`}>2022 — 2026</span>
               <div>
@@ -58,7 +61,7 @@ export default function Profile({ isDarkMode }) {
 
         <section>
           <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>PROJECTS</h3>
-          <div className={`flex flex-col bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 rounded-xl p-2 md:p-4 shadow-sm`}>
+          <div className={`flex flex-col bg-white dark:bg-transparent border border-black/5 dark:border-white/10 rounded-xl p-2 md:p-4 shadow-sm`}>
             {[
               { title: "Merge Optimization", desc: "A side project experimenting with array logic and space efficiency." },
               { title: "Personal Archive", desc: "A simple space for writing and keeping track of things." }
