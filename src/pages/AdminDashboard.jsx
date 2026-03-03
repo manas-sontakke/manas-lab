@@ -97,13 +97,13 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                     </div>
                     <div className="space-y-6">
                         {(formData.experience || []).map((exp, idx) => (
-                            <div key={exp.id || idx} className="flex gap-4 items-start relative border-l-2 border-black/5 dark:border-white/5 pl-4">
-                                <button type="button" onClick={() => removeArrayItem('experience', idx)} className="absolute -left-10 top-2 text-zinc-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                                <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <div key={exp.id || idx} className="flex gap-3 md:gap-6 items-start border-l-2 border-black/5 dark:border-white/5 pl-4">
+                                <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <input placeholder="Years" className={inputClasses} value={exp.years} onChange={e => updateArray('experience', idx, 'years', e.target.value)} />
                                     <input placeholder="Title" className={`${inputClasses} md:col-span-1`} value={exp.title} onChange={e => updateArray('experience', idx, 'title', e.target.value)} />
                                     <input placeholder="Description" className={`${inputClasses} md:col-span-2`} value={exp.description} onChange={e => updateArray('experience', idx, 'description', e.target.value)} />
                                 </div>
+                                <button type="button" onClick={() => removeArrayItem('experience', idx)} className="text-zinc-400 hover:text-red-500 pt-2 shrink-0"><Trash2 className="w-4 h-4" /></button>
                             </div>
                         ))}
                     </div>
@@ -117,12 +117,12 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                     </div>
                     <div className="space-y-6">
                         {(formData.projects || []).map((proj, idx) => (
-                            <div key={proj.id || idx} className="flex gap-4 items-start relative border-l-2 border-black/5 dark:border-white/5 pl-4">
-                                <button type="button" onClick={() => removeArrayItem('projects', idx)} className="absolute -left-10 top-2 text-zinc-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                                <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div key={proj.id || idx} className="flex gap-3 md:gap-6 items-start border-l-2 border-black/5 dark:border-white/5 pl-4">
+                                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <input placeholder="Title" className={`${inputClasses} md:col-span-1`} value={proj.title} onChange={e => updateArray('projects', idx, 'title', e.target.value)} />
                                     <input placeholder="Description" className={`${inputClasses} md:col-span-2`} value={proj.description} onChange={e => updateArray('projects', idx, 'description', e.target.value)} />
                                 </div>
+                                <button type="button" onClick={() => removeArrayItem('projects', idx)} className="text-zinc-400 hover:text-red-500 pt-2 shrink-0"><Trash2 className="w-4 h-4" /></button>
                             </div>
                         ))}
                     </div>
@@ -136,12 +136,12 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                     </div>
                     <div className="space-y-6">
                         {(formData.socials || []).map((social, idx) => (
-                            <div key={social.id || idx} className="flex gap-4 items-start relative border-l-2 border-black/5 dark:border-white/5 pl-4">
-                                <button type="button" onClick={() => removeArrayItem('socials', idx)} className="absolute -left-10 top-2 text-zinc-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div key={social.id || idx} className="flex gap-3 md:gap-6 items-start border-l-2 border-black/5 dark:border-white/5 pl-4">
+                                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <input placeholder="Platform (e.g. GITHUB)" className={inputClasses} value={social.platform} onChange={e => updateArray('socials', idx, 'platform', e.target.value.toUpperCase())} />
                                     <input placeholder="URL" className={inputClasses} value={social.url} onChange={e => updateArray('socials', idx, 'url', e.target.value)} />
                                 </div>
+                                <button type="button" onClick={() => removeArrayItem('socials', idx)} className="text-zinc-400 hover:text-red-500 pt-2 shrink-0"><Trash2 className="w-4 h-4" /></button>
                             </div>
                         ))}
                     </div>

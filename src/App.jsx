@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'firebase/auth';
 import { auth, isConfigValid } from './services/firebase';
 import { UI } from './utils/constants';
 import Journal from './pages/Journal';
@@ -19,34 +19,52 @@ function App() {
 
   // Added import for X at the top manually previously, ensuring it's available.
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [adminKey, setAdminKey] = useState('');
+  const [email, setEmail] = useState('sontakke.manas@gmail.com');
+  const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   useEffect(() => {
     if (!auth) return;
-    const init = async () => {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else { await signInAnonymously(auth); }
-      } catch (e) {
-        console.error("[App Auth] Firebase initialization/sign-in error:", e);
+    const unsubscribe = onAuthStateChanged(auth, async (usr) => {
+      setUser(usr);
+      if (usr && !usr.isAnonymous && usr.email === 'sontakke.manas@gmail.com') {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+        // Automatically ensure fallback anonymous sign-in
+        if (!usr) {
+          try { await signInAnonymously(auth); }
+          catch (e) { console.error("[App Auth] Anonymous fallback failed", e); }
+        }
       }
-    };
-    init();
-    return onAuthStateChanged(auth, setUser);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const handleAuth = (e) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
-    if (adminKey === 'iitk2026') {
-      setIsAdmin(true);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       setShowAuthModal(false);
-      setAdminKey('');
-    } else {
-      console.warn("[App Auth] Invalid admin key attempt.");
+      setPassword('');
+      setAuthError(false);
+    } catch (err) {
+      console.error("[App Auth] Invalid credentials.", err);
       setAuthError(true);
-      setTimeout(() => setAuthError(false), 2000);
+      setTimeout(() => setAuthError(false), 3000);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) return;
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetSent(true);
+      setTimeout(() => setResetSent(false), 4000);
+    } catch (err) {
+      console.error("[App Auth] Error sending reset email:", err);
     }
   };
 
@@ -82,22 +100,46 @@ function App() {
               </div>
 
               <form onSubmit={handleAuth} className="space-y-6">
-                <div>
+                <div className="space-y-4">
                   <input
-                    type="password"
-                    autoFocus
-                    value={adminKey}
-                    onChange={(e) => setAdminKey(e.target.value)}
-                    placeholder="Enter access key..."
-                    className={`w-full bg-black/[0.02] dark:bg-white/[0.04] border ${authError ? 'border-red-500/50 text-red-500' : 'border-black/5 dark:border-white/10'} rounded-xl px-4 py-3 outline-none focus:border-black/20 dark:focus:border-white/20 transition-colors ${UI.sans} ${themeColors.textMain}`}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Email address..."
+                    className={`w-full bg-black/[0.02] dark:bg-white/[0.04] border border-black/5 dark:border-white/10 rounded-xl px-4 py-3 outline-none focus:border-black/20 dark:focus:border-white/20 transition-colors ${UI.sans} ${themeColors.textMain}`}
                   />
-                  {authError && <p className="text-red-500 text-xs mt-2 font-medium">Invalid credentials.</p>}
+                  <div>
+                    <input
+                      type="password"
+                      autoFocus
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Password..."
+                      className={`w-full bg-black/[0.02] dark:bg-white/[0.04] border ${authError ? 'border-red-500/50 text-red-500' : 'border-black/5 dark:border-white/10'} rounded-xl px-4 py-3 outline-none focus:border-black/20 dark:focus:border-white/20 transition-colors ${UI.sans} ${themeColors.textMain}`}
+                    />
+                    {authError && <p className="text-red-500 text-xs mt-2 font-medium">Invalid credentials.</p>}
+                  </div>
                 </div>
-                <button type="submit" className={`w-full flex items-center justify-center gap-2 ${UI.label} py-3.5 bg-[#1A1A1A] dark:bg-white/10 text-white dark:text-zinc-200 hover:opacity-80 transition-opacity rounded-xl`}>
-                  <Lock className="w-4 h-4" /> Authenticate
-                </button>
+                <div className="flex items-center justify-between">
+                  <button type="button" onClick={handleForgotPassword} className="text-xs font-medium text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 transition-colors">
+                    {resetSent ? 'Recovery Email Sent' : 'Forgot Password?'}
+                  </button>
+                  <button type="submit" className={`flex items-center gap-2 ${UI.label} px-5 py-2.5 bg-[#1A1A1A] dark:bg-white/10 text-white dark:text-zinc-200 hover:opacity-80 transition-opacity rounded-lg`}>
+                    <Lock className="w-3.5 h-3.5" /> Login
+                  </button>
+                </div>
               </form>
             </div>
+          </div>
+        )}
+
+        {/* Global Admin Indicator */}
+        {isAdmin && (
+          <div className="fixed left-0 top-0 bottom-0 w-8 md:w-10 bg-[#1A1A1A]/5 dark:bg-[#1A1A1A]/50 border-r border-[#1A1A1A]/10 dark:border-white/5 flex flex-col items-center justify-center z-[150] shadow-[10px_0_30px_rgba(0,0,0,0.03)] dark:shadow-none backdrop-blur-sm">
+            <span className="[writing-mode:vertical-lr] rotate-180 uppercase text-[10px] md:text-[11px] tracking-[0.2em] font-mono text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              ADMIN MODE
+            </span>
           </div>
         )}
 
@@ -159,8 +201,14 @@ function App() {
               <div className="flex flex-col items-start md:items-end gap-2">
                 <div className="flex items-center gap-4">
                   <button
-                    onClick={() => isAdmin ? setIsAdmin(false) : setShowAuthModal(true)}
-                    className={`text-zinc-600 dark:text-zinc-500 ${UI.linkHover} transition-colors ${isAdmin ? 'text-emerald-500 dark:text-emerald-500 hover:text-emerald-600' : ''}`}
+                    onClick={() => {
+                      if (isAdmin) {
+                        signOut(auth).then(() => { setIsAdmin(false); setView('journal'); });
+                      } else {
+                        setShowAuthModal(true);
+                      }
+                    }}
+                    className={`text-zinc-600 dark:text-zinc-500 ${UI.linkHover} transition-colors ${isAdmin ? 'text-red-500 dark:text-red-500 hover:text-red-600' : ''}`}
                     title={isAdmin ? "Log Out" : "System Access"}
                   >
                     <Terminal className="w-4 h-4" />
