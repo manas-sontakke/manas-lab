@@ -45,10 +45,10 @@ function App() {
   };
 
   const themeColors = {
-    bg: isDarkMode ? 'bg-[#0A0A0A]' : 'bg-[#F4F1EA]',
+    bg: isDarkMode ? 'bg-[#151515]' : 'bg-[#F4F1EA]',
     textMain: isDarkMode ? 'text-[#EDEDED]' : 'text-[#232323]',
     textSub: isDarkMode ? 'text-zinc-500' : 'text-[#5A5A5A]',
-    navBg: isDarkMode ? 'bg-[#0A0A0A]/80 border-white/10' : 'bg-[#F4F1EA]/80 border-black/5',
+    navBg: isDarkMode ? 'bg-[#151515]/80 border-white/10' : 'bg-[#F4F1EA]/80 border-black/5',
     border: isDarkMode ? 'border-white/10' : 'border-black/5'
   };
 
@@ -100,7 +100,7 @@ function App() {
 
         <footer className={`mt-48 pt-12 border-t ${themeColors.border} pb-12 flex flex-col items-center md:items-start justify-between gap-12`}>
           {/* Reangdeba Style Contact Card */}
-          <div className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#111111] shadow-sm mb-8">
+          <div className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/5 bg-white dark:bg-[#1A1A1A] shadow-sm mb-8">
             <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain}`}>Have something to say? Send me an email.</span>
             <a href="mailto:sontakke.manas@gmail.com" className="mt-4 md:mt-0 px-6 py-2.5 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-sans font-medium transition-colors">
               Email me →
@@ -131,19 +131,12 @@ function App() {
             </div>
             <div className="flex flex-col items-start md:items-end gap-2">
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className={`${UI.mono} text-zinc-400`}>SYSTEM ONLINE</span>
-                </div>
                 <button
                   onClick={() => isAdmin ? setIsAdmin(false) : setShowAuthModal(true)}
-                  className={`text-zinc-400 ${UI.linkHover} transition-colors ${isAdmin ? 'text-emerald-500 hover:text-emerald-600' : ''}`}
+                  className={`text-zinc-600 dark:text-zinc-500 ${UI.linkHover} transition-colors ${isAdmin ? 'text-emerald-500 dark:text-emerald-500 hover:text-emerald-600' : ''}`}
                   title={isAdmin ? "Log Out" : "System Access"}
                 >
-                  <Terminal className="w-3.5 h-3.5" />
+                  <Terminal className="w-4 h-4" />
                 </button>
               </div>
               <p className={`${UI.mono} text-zinc-400 mt-4`}>© 2026 MANAS SONTAKKE</p>

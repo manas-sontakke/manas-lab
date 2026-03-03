@@ -33,7 +33,7 @@ export default function Journal({ isAdmin, isDarkMode }) {
   }, []);
 
   const themeColors = {
-    modalBg: isDarkMode ? 'bg-[#0A0A0A]' : 'bg-[#F4F1EA]',
+    modalBg: isDarkMode ? 'bg-[#1E1E1E]' : 'bg-[#F4F1EA]',
     textMain: isDarkMode ? 'text-[#EDEDED]' : 'text-[#232323]',
     textSub: isDarkMode ? 'text-zinc-500' : 'text-[#5A5A5A]',
     border: isDarkMode ? 'border-white/10' : 'border-black/10'
@@ -99,34 +99,34 @@ export default function Journal({ isAdmin, isDarkMode }) {
 
   // --- RENDERING ---
 
-  // 1. READING MODAL (Medium Style)
+  // 1. READING MODAL (In-place Card Overlay)
   if (selectedBlog) {
     return (
-      <div className={`fixed inset-0 z-[150] flex flex-col p-4 md:p-0 ${themeColors.modalBg} animate-in fade-in duration-300`}>
-        <div className={`w-full h-full md:max-w-[680px] mx-auto overflow-y-auto relative outline-none z-20 custom-scrollbar pb-32`}>
-          <button onClick={() => setSelectedBlog(null)} className={`fixed top-8 right-8 p-3 rounded-full hover:scale-110 transition-all z-50 text-zinc-400 hover:text-black dark:hover:text-white`}><X className="w-6 h-6" /></button>
+      <div className={`w-full max-w-[680px] mx-auto bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 rounded-2xl p-6 md:p-12 shadow-sm animate-in fade-in slide-in-from-bottom-2 duration-300 relative`}>
+        <button onClick={() => setSelectedBlog(null)} className={`absolute top-6 right-6 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors z-50 text-zinc-400 hover:text-black dark:hover:text-white`}>
+          <X className="w-5 h-5" />
+        </button>
 
-          <div className="pt-24 md:pt-32 pb-12 w-full">
-            <h1 className={`${UI.serif} text-4xl md:text-[3.2rem] mb-6 leading-[1.15] tracking-tight ${themeColors.textMain}`}>{selectedBlog.title}</h1>
+        <h1 className={`${UI.serif} text-3xl md:text-[2.8rem] mb-6 mt-4 leading-[1.15] tracking-tight ${themeColors.textMain}`}>
+          {selectedBlog.title}
+        </h1>
 
-            <div className={`mb-16 pb-8 flex items-center justify-between border-b ${themeColors.border}`}>
-              <div className="flex items-center gap-4 text-zinc-500 text-[0.95rem] font-sans">
-                <span>{selectedBlog.date}</span>
-                <span>·</span>
-                <span>{selectedBlog.readTime}</span>
-              </div>
-              {isAdmin && typeof selectedBlog.id === 'string' && !selectedBlog.id.startsWith('s') && (
-                <div className="flex gap-6">
-                  <button onClick={() => { startEditing(selectedBlog); setSelectedBlog(null); }} className={`font-sans text-[0.95rem] text-zinc-400 hover:text-black dark:hover:text-white transition-colors`}>Edit Entry</button>
-                  <button onClick={() => deleteDocItem(selectedBlog.id)} className={`font-sans text-[0.95rem] text-red-500 hover:text-red-700 transition-colors`}>Delete</button>
-                </div>
-              )}
-            </div>
-
-            <div className={`${UI.serif} text-[1.25rem] md:text-[1.35rem] space-y-8 ${themeColors.textMain} leading-[1.8] tracking-[-0.01em]`}>
-              {selectedBlog.content ? selectedBlog.content.split('\n').map((p, i) => p.trim() !== '' ? <p key={i} className="mb-6">{p}</p> : null) : <p>No content.</p>}
-            </div>
+        <div className={`mb-10 pb-6 flex items-center justify-between border-b border-black/5 dark:border-white/5`}>
+          <div className="flex items-center gap-4 text-zinc-500 text-[0.85rem] font-sans">
+            <span>{selectedBlog.date}</span>
+            <span>·</span>
+            <span>{selectedBlog.readTime}</span>
           </div>
+          {isAdmin && typeof selectedBlog.id === 'string' && !selectedBlog.id.startsWith('s') && (
+            <div className="flex gap-4">
+              <button onClick={() => { startEditing(selectedBlog); setSelectedBlog(null); }} className={`font-sans text-[0.85rem] text-zinc-400 hover:text-black dark:hover:text-white transition-colors`}>Edit</button>
+              <button onClick={() => deleteDocItem(selectedBlog.id)} className={`font-sans text-[0.85rem] text-red-500 hover:text-red-700 transition-colors`}>Delete</button>
+            </div>
+          )}
+        </div>
+
+        <div className={`${UI.serif} text-[1.15rem] md:text-[1.25rem] space-y-6 ${themeColors.textMain} leading-[1.7] tracking-[-0.01em]`}>
+          {selectedBlog.content ? selectedBlog.content.split('\n').map((p, i) => p.trim() !== '' ? <p key={i} className="mb-6">{p}</p> : null) : <p>No content.</p>}
         </div>
       </div>
     );
@@ -170,38 +170,17 @@ export default function Journal({ isAdmin, isDarkMode }) {
         )}
       </header>
 
-      <div className="space-y-16">
-        {/* LATEST POST */}
-        {displayBlogs.length > 0 && (
-          <section>
-            <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>LATEST</h3>
-            <div onClick={() => setSelectedBlog(displayBlogs[0])} className={`cursor-pointer group flex flex-col bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 rounded-xl p-8 shadow-sm transition-all hover:-translate-y-0.5`}>
-              <h2 className={`font-sans font-medium text-xl md:text-[1.4rem] leading-[1.3] mb-3 ${themeColors.textMain}`}>{displayBlogs[0].title}</h2>
-              <div className="flex items-center gap-2 text-zinc-500 text-xs md:text-sm mb-6 pb-2">
-                <span>{displayBlogs[0].date}</span>
-                <span className="opacity-50">·</span>
-                <span>{displayBlogs[0].readTime || "4 min read"}</span>
-              </div>
-              <div className={`flex items-center gap-1 text-[#7852FF] dark:text-[#A898FF] text-sm font-medium`}>
-                Keep reading <ArrowRight className="w-3.5 h-3.5" />
-              </div>
+      {/* LIST */}
+      <section className="pb-16 mt-16 md:mt-24">
+        <div className={`flex flex-col bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/5 rounded-2xl p-4 md:p-6 shadow-sm`}>
+          {displayBlogs.map((blog, idx) => (
+            <div key={blog.id} onClick={() => setSelectedBlog(blog)} className={`group py-5 px-4 md:px-6 flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-8 cursor-pointer transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02] rounded-xl ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-6 mb-2' : ''}`}>
+              <span className={`font-sans text-zinc-400 text-sm md:text-[0.95rem] w-24 shrink-0`}>{blog.date}</span>
+              <h4 className={`font-sans font-medium text-[1rem] md:text-[1.1rem] leading-[1.4] ${themeColors.textMain}`}>{blog.title}</h4>
             </div>
-          </section>
-        )}
-
-        {/* LIST */}
-        <section className="pb-16">
-          <h3 className={`font-sans font-medium text-zinc-400 mb-4 uppercase tracking-[0.1em] text-[10px]`}>ESSAYS</h3>
-          <div className={`flex flex-col bg-white dark:bg-[#111111] border border-black/5 dark:border-white/5 rounded-xl p-2 md:p-4 shadow-sm`}>
-            {displayBlogs.map((blog, idx) => (
-              <div key={blog.id} onClick={() => setSelectedBlog(blog)} className={`group py-4 px-4 flex flex-row items-baseline gap-6 md:gap-8 cursor-pointer transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02] rounded-lg ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-5 mb-1' : ''}`}>
-                <span className={`font-sans text-zinc-400 text-sm md:text-[0.95rem] w-16 md:w-20 shrink-0`}>{blog.date}</span>
-                <h4 className={`font-sans text-[0.95rem] md:text-[1rem] ${themeColors.textMain}`}>{blog.title}</h4>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
