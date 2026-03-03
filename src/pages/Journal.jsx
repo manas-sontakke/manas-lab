@@ -120,9 +120,9 @@ export default function Journal({ isAdmin, isDarkMode }) {
     <div className="relative w-full">
       {/* 1. READING MODAL (Floating Overlay) */}
       {selectedBlog && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-12 bg-black/10 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className={`w-full h-full max-h-[85vh] max-w-[680px] mx-auto bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/10 rounded-2xl p-6 md:p-12 shadow-2xl overflow-y-auto custom-scrollbar relative animate-in zoom-in-[0.98] slide-in-from-bottom-4 duration-400 ease-out`}>
-            <button onClick={() => setSelectedBlog(null)} className={`absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors z-[60] text-zinc-400 hover:text-black dark:hover:text-white bg-white dark:bg-[#1A1A1A]`}>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-0 md:p-8 lg:p-12 bg-black/10 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className={`w-full h-full md:max-h-[92vh] max-w-[760px] mx-auto bg-white dark:bg-[#1E1E1E] md:border border-black/5 dark:border-white/10 md:rounded-[2rem] p-8 md:p-16 lg:p-20 shadow-2xl overflow-y-auto custom-scrollbar relative animate-in zoom-in-[0.98] slide-in-from-bottom-4 duration-400 ease-out`}>
+            <button onClick={() => setSelectedBlog(null)} className={`fixed md:absolute top-4 right-4 md:top-8 md:right-8 p-3 md:p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors z-[60] text-zinc-400 hover:text-black dark:hover:text-white bg-white/80 dark:bg-[#1A1A1A]/80 backdrop-blur-md md:bg-white md:dark:bg-[#1A1A1A]`}>
               <X className="w-5 h-5" />
             </button>
 
