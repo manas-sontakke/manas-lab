@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, isConfigValid } from './services/firebase';
 import { UI } from './utils/constants';
-import Journal from './pages/Journal';
-import Profile from './pages/Profile';
+import Journal from './pages/Journal'; // Maps to "Indoor"
+import Profile from './pages/Profile'; // Maps to "Outdoor"
 import AdminDashboard from './pages/AdminDashboard';
 import { GlobalContentProvider, useGlobalContent } from './contexts/GlobalContentContext';
 import {
@@ -122,13 +122,12 @@ function App() {
           </button>
         )}
 
-        {/* --- Modular Diagonal Pattern Background --- */}
-        {/* Can be easily removed or disabled by commenting out this div. Hidden on mobile, subtle on desktop. */}
+        {/* --- Global Subtle Noise Grain --- */}
         <div
-          className="hidden lg:block fixed inset-0 z-0 pointer-events-none opacity-[0.06] dark:opacity-[0.08]"
+          className="fixed inset-0 z-[1] pointer-events-none opacity-[0.03] dark:opacity-[0.04] mix-blend-overlay"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            backgroundAttachment: 'fixed' // Parallax effect
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='globalNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23globalNoise)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'repeat',
           }}
         />
         {/* Animate on admin state change layer */}
@@ -141,13 +140,13 @@ function App() {
                 <span className={`font-sans font-semibold text-lg tracking-tight`} onClick={() => setView('journal')}>Manas Sontakke</span>
               </div>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 relative z-10">
               <div className={`flex gap-4`}>
                 {isAdmin && (
                   <button onClick={() => setView('dashboard')} className={`${UI.label} transition-colors ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Dashboard</button>
                 )}
-                <button onClick={() => setView('journal')} className={`${UI.label} transition-colors ${view === 'journal' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Journal</button>
-                <button onClick={() => setView('profile')} className={`${UI.label} transition-colors ${view === 'profile' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Profile</button>
+                <button onClick={() => setView('journal')} className={`${UI.label} transition-colors ${view === 'journal' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Indoor</button>
+                <button onClick={() => setView('profile')} className={`${UI.label} transition-colors ${view === 'profile' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Outdoor</button>
               </div>
               <div className="w-px h-4 bg-zinc-300 dark:bg-zinc-800"></div>
               <button
@@ -172,11 +171,14 @@ function App() {
             )}
           </main>
 
-          <footer className={`mt-16 pt-10 border-t ${themeColors.border} pb-12 flex flex-col items-center md:items-start justify-between gap-12`}>
+          <footer className={`mt-16 pt-10 border-t ${themeColors.border} pb-12 flex flex-col items-center md:items-start justify-between gap-12 relative z-10`}>
             {/* Reangdeba Style Contact Card */}
-            <div className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-[#1E1E1E] shadow-sm mb-8">
-              <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain}`}>Have something to say? Send me an email.</span>
-              <a href="mailto:sontakke.manas@gmail.com" className="mt-4 md:mt-0 px-6 py-2.5 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-sans font-medium transition-colors">
+            <div className="relative w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 glass-texture shadow-sm mb-8 overflow-hidden group">
+              {/* Subtle hover gradient on the contact card */}
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/0 to-emerald-500/5 dark:from-white/0 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+              <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain} relative z-10`}>Have something to say? Send me an email.</span>
+              <a href="mailto:sontakke.manas@gmail.com" className="relative z-10 mt-4 md:mt-0 px-6 py-2.5 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-sans font-medium transition-colors">
                 Email me →
               </a>
             </div>
