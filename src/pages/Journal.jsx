@@ -32,6 +32,16 @@ export default function Journal({ isAdmin, isDarkMode }) {
     return () => unsubscribe();
   }, []);
 
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (selectedBlog) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [selectedBlog]);
+
   const themeColors = {
     modalBg: isDarkMode ? 'bg-[#1E1E1E]' : 'bg-[#F4F1EA]',
     textMain: isDarkMode ? 'text-[#EDEDED]' : 'text-[#232323]',
@@ -109,7 +119,7 @@ export default function Journal({ isAdmin, isDarkMode }) {
       {/* 1. READING MODAL (Floating Overlay) */}
       {selectedBlog && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-12 bg-black/10 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className={`w-full h-full max-h-[85vh] max-w-[680px] mx-auto bg-white dark:bg-[#111111] border border-black/5 dark:border-white/10 rounded-2xl p-6 md:p-12 shadow-2xl overflow-y-auto custom-scrollbar relative animate-in zoom-in-[0.98] slide-in-from-bottom-4 duration-400 ease-out`}>
+          <div className={`w-full h-full max-h-[85vh] max-w-[680px] mx-auto bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/10 rounded-2xl p-6 md:p-12 shadow-2xl overflow-y-auto custom-scrollbar relative animate-in zoom-in-[0.98] slide-in-from-bottom-4 duration-400 ease-out`}>
             <button onClick={() => setSelectedBlog(null)} className={`absolute top-4 right-4 md:top-6 md:right-6 p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors z-[60] text-zinc-400 hover:text-black dark:hover:text-white bg-white dark:bg-[#1A1A1A]`}>
               <X className="w-5 h-5" />
             </button>
@@ -174,7 +184,7 @@ export default function Journal({ isAdmin, isDarkMode }) {
 
           {/* LIST */}
           <section className="pb-8 mt-8 md:mt-12">
-            <div className={`flex flex-col bg-white dark:bg-transparent border border-black/5 dark:border-white/10 rounded-2xl p-4 md:p-6 shadow-sm`}>
+            <div className={`flex flex-col bg-white dark:bg-[#1E1E1E] border border-black/5 dark:border-white/10 rounded-2xl p-4 md:p-6 shadow-sm`}>
               {displayBlogs.map((blog, idx) => (
                 <div key={blog.id} onClick={() => setSelectedBlog(blog)} className={`group py-5 px-4 md:px-6 flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-8 cursor-pointer transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02] rounded-xl ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-6 mb-2' : ''}`}>
                   <span className={`font-sans text-zinc-400 text-sm md:text-[0.95rem] w-24 shrink-0`}>{blog.date}</span>

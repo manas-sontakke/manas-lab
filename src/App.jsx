@@ -103,7 +103,7 @@ function App() {
 
         <footer className={`mt-16 pt-10 border-t ${themeColors.border} pb-12 flex flex-col items-center md:items-start justify-between gap-12`}>
           {/* Reangdeba Style Contact Card */}
-          <div className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-transparent shadow-sm mb-8">
+          <div className="w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 bg-white dark:bg-[#1E1E1E] shadow-sm mb-8">
             <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain}`}>Have something to say? Send me an email.</span>
             <a href="mailto:sontakke.manas@gmail.com" className="mt-4 md:mt-0 px-6 py-2.5 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-sans font-medium transition-colors">
               Email me →
