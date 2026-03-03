@@ -91,7 +91,7 @@ function App() {
               <div className="mb-8">
                 <Terminal className={`w-6 h-6 mb-4 ${themeColors.textMain}`} />
                 <h2 className={`${UI.serif} text-2xl tracking-tight ${themeColors.textMain}`}>System Access</h2>
-                <p className={`${UI.sans} text-sm text-zinc-500 mt-2`}>Authenticate to manage the digital garden.</p>
+                <p className={`${UI.sans} text-sm text-zinc-500 mt-2`}>Hey there! This terminal is just for Manas. If you're not him, you should probably head back up.</p>
               </div>
 
               <form onSubmit={handleAuth} className="space-y-6">
@@ -108,12 +108,16 @@ function App() {
         {/* Global Admin Indicator */}
         {isAdmin && (
           <div className="fixed left-0 top-0 bottom-0 w-8 md:w-10 bg-[#1A1A1A]/5 dark:bg-[#1A1A1A]/50 border-r border-[#1A1A1A]/10 dark:border-white/5 flex flex-col items-center justify-center z-[150] shadow-[10px_0_30px_rgba(0,0,0,0.03)] dark:shadow-none backdrop-blur-sm">
-            <span className="[writing-mode:vertical-lr] rotate-180 uppercase text-[10px] md:text-[11px] tracking-[0.2em] font-mono text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className={`[writing-mode:vertical-lr] rotate-180 uppercase text-[10px] md:text-[11px] tracking-[0.2em] font-mono font-semibold flex items-center gap-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDarkMode ? 'bg-zinc-400' : 'bg-zinc-600'}`} />
               ADMIN MODE
             </span>
           </div>
         )}
+
+        {/* --- Subtle Desktop Layout Framing Lines --- */}
+        <div className="hidden lg:block fixed left-[max(10vw,calc(50%-400px))] top-0 bottom-0 w-px bg-black/[0.03] dark:bg-white/[0.03] z-0 pointer-events-none" />
+        <div className="hidden lg:block fixed right-[max(10vw,calc(50%-400px))] top-0 bottom-0 w-px bg-black/[0.03] dark:bg-white/[0.03] z-0 pointer-events-none" />
 
         <div className="relative max-w-[640px] mx-auto px-6 py-16 md:py-24">
           <nav className={`flex justify-between items-center mb-20 gap-4 z-50 transition-all px-6 py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'}`}>
