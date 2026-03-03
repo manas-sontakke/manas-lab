@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { onAuthStateChanged, signInAnonymously, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, verifyPasswordResetCode, confirmPasswordReset } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, isConfigValid } from './services/firebase';
 import { UI } from './utils/constants';
 import Journal from './pages/Journal';
@@ -48,27 +48,19 @@ function App() {
   const handleAuth = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, 'sontakke.manas@gmail.com', password);
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
       setShowAuthModal(false);
-      setPassword('');
       setAuthError(false);
     } catch (err) {
-      console.error("[App Auth] Invalid credentials.", err);
+      console.error("[App Auth] Google Sign-In failed.", err);
       setAuthError(true);
       setTimeout(() => setAuthError(false), 3000);
     }
   };
 
-  const handleForgotPassword = async () => {
-    try {
-      // Reverted to default Firebase handler to guarantee email delivery regardless of custom domains
-      await sendPasswordResetEmail(auth, 'sontakke.manas@gmail.com');
-      setResetSent(true);
-      setTimeout(() => setResetSent(false), 4000);
-    } catch (err) {
-      console.error("[App Auth] Error sending reset email:", err);
-    }
-  };
+  // Removed handleForgotPassword since we are strictly using Google OAuth now.
 
   const themeColors = {
     bg: isDarkMode ? 'bg-[#151515]' : 'bg-[#F4F1EA]',
@@ -103,27 +95,11 @@ function App() {
               </div>
 
               <form onSubmit={handleAuth} className="space-y-6">
-                <div className="space-y-4">
-                  <div>
-                    <input
-                      type="password"
-                      autoFocus
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Password..."
-                      className={`w-full bg-black/[0.02] dark:bg-white/[0.04] border ${authError ? 'border-red-500/50 text-red-500' : 'border-black/5 dark:border-white/10'} rounded-xl px-4 py-3 outline-none focus:border-black/20 dark:focus:border-white/20 transition-colors ${UI.sans} ${themeColors.textMain}`}
-                    />
-                    {authError && <p className="text-red-500 text-xs mt-2 font-medium">Invalid credentials.</p>}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <button type="button" onClick={handleForgotPassword} className="text-xs font-medium text-emerald-600 dark:text-emerald-500 hover:text-emerald-700 transition-colors">
-                    {resetSent ? 'Recovery Email Sent to manas_sontakke...' : 'Forgot Password?'}
-                  </button>
-                  <button type="submit" className={`flex items-center gap-2 ${UI.label} px-5 py-2.5 bg-[#1A1A1A] dark:bg-white/10 text-white dark:text-zinc-200 hover:opacity-80 transition-opacity rounded-lg`}>
-                    <Lock className="w-3.5 h-3.5" /> Login
-                  </button>
-                </div>
+                <button type="submit" className={`w-full flex items-center justify-center gap-3 ${UI.label} py-3.5 bg-white dark:bg-[#2A2A2A] text-black dark:text-zinc-200 border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-xl`}>
+                  <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" /><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" /><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" /><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" /></svg>
+                  Connect with Google
+                </button>
+                {authError && <p className="text-red-500 text-xs text-center font-medium mt-4">Authentication failed. Please use sontakke.manas@gmail.com</p>}
               </form>
             </div>
           </div>
@@ -140,7 +116,7 @@ function App() {
         )}
 
         <div className="relative max-w-[640px] mx-auto px-6 py-16 md:py-24">
-          <nav className={`flex justify-between items-center mb-20 gap-4 z-50 transition-all px-6 py-4 rounded-2xl border backdrop-blur-md shadow-sm ${isDarkMode ? 'bg-[#1A1A1A]/80 border-white/10' : 'bg-white/80 border-black/5'}`}>
+          <nav className={`flex justify-between items-center mb-20 gap-4 z-50 transition-all px-6 py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'}`}>
             <div className="cursor-default select-none shrink-0">
               <div className="flex items-center gap-3">
                 <span className={`font-sans font-semibold text-lg tracking-tight`} onClick={() => setView('journal')}>Manas Sontakke</span>
