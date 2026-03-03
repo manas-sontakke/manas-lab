@@ -3,8 +3,10 @@ import { collection, addDoc, onSnapshot, query, serverTimestamp, deleteDoc, upda
 import { db, appId } from '../services/firebase';
 import { UI, STATIC_BLOGS } from '../utils/constants';
 import { Plus, X, Clock, ArrowRight, Trash2, Edit2, Database, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { useGlobalContent } from '../contexts/GlobalContentContext';
 
 export default function Journal({ isAdmin, isDarkMode }) {
+  const { content } = useGlobalContent();
   const [subView, setSubView] = useState('archive');
   const [blogs, setBlogs] = useState([]);
   const [selectedBlog, setSelectedBlog] = useState(null);
@@ -171,8 +173,8 @@ export default function Journal({ isAdmin, isDarkMode }) {
         <div className="animate-in fade-in duration-700 w-full mb-12">
           <header className={`mb-8 flex justify-between items-end gap-8`}>
             <div className="max-w-xl">
-              <h1 className={`${UI.serif} text-[1.35rem] md:text-[1.5rem] leading-[1.65] ${themeColors.textMain}`}>
-                Hey, I'm Manas. My friends also call me Sontakke. I write about architecture, learning, and the systems I've built.
+              <h1 className={`${UI.serif} text-[1.35rem] md:text-[1.5rem] leading-[1.65] ${themeColors.textMain} whitespace-pre-wrap`}>
+                {content?.journalIntro || "Welcome to my digital garden."}
               </h1>
             </div>
             {isAdmin && (
