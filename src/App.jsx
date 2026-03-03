@@ -91,7 +91,7 @@ function App() {
               <div className="mb-8">
                 <Terminal className={`w-6 h-6 mb-4 ${themeColors.textMain}`} />
                 <h2 className={`${UI.serif} text-2xl tracking-tight ${themeColors.textMain}`}>System Access</h2>
-                <p className={`${UI.sans} text-sm text-zinc-500 mt-2`}>Hey there! This terminal is just for Manas. If you're not him, you should probably head back up.</p>
+                <p className={`${UI.sans} text-sm text-zinc-500 mt-2`}>Hey friend! This console is just for Manas to tend his digital garden. Need to reach him? The email link below is a better bet!</p>
               </div>
 
               <form onSubmit={handleAuth} className="space-y-6">
@@ -105,19 +105,34 @@ function App() {
           </div>
         )}
 
-        {/* Global Admin Indicator */}
+        {/* Global Admin Indicator / Exit Button */}
         {isAdmin && (
-          <div className="fixed left-0 top-0 bottom-0 w-8 md:w-10 bg-[#1A1A1A]/5 dark:bg-[#1A1A1A]/50 border-r border-[#1A1A1A]/10 dark:border-white/5 flex flex-col items-center justify-center z-[150] shadow-[10px_0_30px_rgba(0,0,0,0.03)] dark:shadow-none backdrop-blur-sm">
-            <span className={`[writing-mode:vertical-lr] rotate-180 uppercase text-[10px] md:text-[11px] tracking-[0.2em] font-mono font-semibold flex items-center gap-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDarkMode ? 'bg-zinc-400' : 'bg-zinc-600'}`} />
-              ADMIN MODE
+          <button
+            onClick={() => {
+              signOut(auth).then(() => { setIsAdmin(false); setView('journal'); });
+            }}
+            className="group fixed left-0 top-0 bottom-0 w-8 md:w-10 bg-[#1A1A1A]/5 dark:bg-[#1A1A1A]/50 hover:bg-[#1A1A1A]/10 dark:hover:bg-[#1A1A1A]/80 border-r border-[#1A1A1A]/10 dark:border-white/5 flex flex-col items-center justify-center z-[150] shadow-[10px_0_30px_rgba(0,0,0,0.03)] dark:shadow-none backdrop-blur-sm transition-all duration-500 hover:w-10 md:hover:w-12 cursor-pointer"
+            title="Click to exit Admin Mode"
+          >
+            <span className={`[writing-mode:vertical-lr] rotate-180 uppercase text-[10px] md:text-[11px] tracking-[0.2em] font-mono font-semibold flex items-center gap-3 transition-colors ${isDarkMode ? 'text-zinc-500 group-hover:text-zinc-300' : 'text-zinc-500 group-hover:text-zinc-800'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDarkMode ? 'bg-zinc-400 group-hover:bg-red-400' : 'bg-zinc-500 group-hover:bg-red-500'}`} />
+              <span className="group-hover:hidden transition-all">ADMIN MODE</span>
+              <span className="hidden group-hover:block transition-all text-red-500 max-h-0 group-hover:max-h-[200px] overflow-hidden">EXIT SYSTEM</span>
             </span>
-          </div>
+          </button>
         )}
 
-        {/* --- Subtle Desktop Layout Framing Lines --- */}
-        <div className="hidden lg:block fixed left-[max(10vw,calc(50%-400px))] top-0 bottom-0 w-px bg-black/[0.03] dark:bg-white/[0.03] z-0 pointer-events-none" />
-        <div className="hidden lg:block fixed right-[max(10vw,calc(50%-400px))] top-0 bottom-0 w-px bg-black/[0.03] dark:bg-white/[0.03] z-0 pointer-events-none" />
+        {/* --- Modular Diagonal Pattern Background --- */}
+        {/* Can be easily removed or disabled by commenting out this div. Hidden on mobile, subtle on desktop. */}
+        <div
+          className="hidden lg:block fixed inset-0 z-0 pointer-events-none opacity-[0.015] dark:opacity-[0.02]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundAttachment: 'fixed' // Parallax effect
+          }}
+        />
+        {/* Animate on admin state change layer */}
+        <div className={`fixed inset-0 z-[190] pointer-events-none transition-all duration-1000 ${isAdmin ? 'bg-emerald-500/0 mix-blend-overlay' : 'bg-black/0'}`} />
 
         <div className="relative max-w-[640px] mx-auto px-6 py-16 md:py-24">
           <nav className={`flex justify-between items-center mb-20 gap-4 z-50 transition-all px-6 py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'}`}>
