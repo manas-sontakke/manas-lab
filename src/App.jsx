@@ -13,7 +13,7 @@ import {
 
 function App() {
   const [view, setView] = useState('journal');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -23,34 +23,9 @@ function App() {
   const [authError, setAuthError] = useState(false);
   const [resetSent, setResetSent] = useState(false);
 
-  // Password Reset Handling (Magic Link interception)
-  const [resetMode, setResetMode] = useState(false);
-  const [oobCode, setOobCode] = useState(null);
-  const [resetStatus, setResetStatus] = useState(null); // 'verifying' | 'valid' | 'invalid' | 'success' | 'error'
-  const [newPassword, setNewPassword] = useState('');
+  // (Reset Mode UI Removed: Relying on bulletproof default Firebase Reset URL)
 
   useEffect(() => {
-    // 1. Check for incoming Firebase Magic Link (Password Reset)
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode');
-    const code = urlParams.get('oobCode');
-
-    if (mode === 'resetPassword' && code) {
-      setResetMode(true);
-      setOobCode(code);
-      setResetStatus('verifying');
-
-      verifyPasswordResetCode(auth, code).then(() => {
-        setResetStatus('valid');
-      }).catch((e) => {
-        console.error("Invalid or expired action code.", e);
-        setResetStatus('invalid');
-      });
-
-      // Clean up URL instantly so it looks pristine
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
     // 2. Standard Auth Initialization
     if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
@@ -60,7 +35,7 @@ function App() {
       } else {
         setIsAdmin(false);
         // Automatically ensure fallback anonymous sign-in
-        if (!usr && !mode) {
+        if (!usr) {
           try { await signInAnonymously(auth); }
           catch (e) { console.error("[App Auth] Anonymous fallback failed", e); }
         }
@@ -86,33 +61,12 @@ function App() {
 
   const handleForgotPassword = async () => {
     try {
-      // Point the continue URL back to the current domain so the user stays natively inside our own UI.
-      const actionCodeSettings = { url: window.location.origin, handleCodeInApp: true };
-      await sendPasswordResetEmail(auth, 'sontakke.manas@gmail.com', actionCodeSettings);
+      // Reverted to default Firebase handler to guarantee email delivery regardless of custom domains
+      await sendPasswordResetEmail(auth, 'sontakke.manas@gmail.com');
       setResetSent(true);
       setTimeout(() => setResetSent(false), 4000);
     } catch (err) {
       console.error("[App Auth] Error sending reset email:", err);
-    }
-  };
-
-  const executePasswordReset = async (e) => {
-    e.preventDefault();
-    if (!newPassword || newPassword.length < 6) { setResetStatus('error'); return; }
-
-    setResetStatus('saving');
-    try {
-      await confirmPasswordReset(auth, oobCode, newPassword);
-      setResetStatus('success');
-      setTimeout(() => {
-        setResetMode(false);
-        setNewPassword('');
-        // Automatically log them in with the new credentials
-        signInWithEmailAndPassword(auth, 'sontakke.manas@gmail.com', newPassword).catch(() => setShowAuthModal(true));
-      }, 2000);
-    } catch (e) {
-      console.error("Failed to reset password", e);
-      setResetStatus('error');
     }
   };
 
@@ -131,42 +85,8 @@ function App() {
     return (
       <div className={`min-h-screen transition-colors duration-500 font-sans ${themeColors.bg} ${themeColors.textMain} selection:bg-black selection:text-white ${isDarkMode ? 'dark' : ''}`}>
 
-        {/* --- Magic Link Password Reset Modal --- */}
-        {resetMode && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/10 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className={`w-full max-w-[400px] bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/10 rounded-3xl p-8 shadow-2xl relative animate-in zoom-in-[0.98] duration-300`}>
-              <div className="mb-8">
-                <Lock className={`w-6 h-6 mb-4 ${themeColors.textMain}`} />
-                <h2 className={`${UI.serif} text-2xl tracking-tight ${themeColors.textMain}`}>Reset Password</h2>
-                <p className={`${UI.sans} text-sm text-zinc-500 mt-2`}>
-                  {resetStatus === 'verifying' ? "Verifying secure link..." :
-                    resetStatus === 'invalid' ? "This link has expired or is invalid." :
-                      resetStatus === 'success' ? "Password successfully updated. Logging you in..." :
-                        "Set your new system password."}
-                </p>
-              </div>
-
-              {resetStatus !== 'verifying' && resetStatus !== 'invalid' && resetStatus !== 'success' && (
-                <form onSubmit={executePasswordReset} className="space-y-6">
-                  <input
-                    type="password"
-                    autoFocus
-                    value={newPassword}
-                    onChange={(e) => { setNewPassword(e.target.value); setResetStatus('valid'); }}
-                    placeholder="New Password (min. 6 chars)..."
-                    className={`w-full bg-black/[0.02] dark:bg-white/[0.04] border ${resetStatus === 'error' ? 'border-red-500/50' : 'border-black/5 dark:border-white/10'} rounded-xl px-4 py-3 outline-none focus:border-black/20 dark:focus:border-white/20 transition-colors ${UI.sans} ${themeColors.textMain}`}
-                  />
-                  <button type="submit" disabled={resetStatus === 'saving'} className={`w-full flex items-center justify-center gap-2 ${UI.label} py-3.5 bg-[#1A1A1A] dark:bg-white/10 text-white dark:text-zinc-200 hover:opacity-80 transition-opacity rounded-xl`}>
-                    {resetStatus === 'saving' ? "Saving..." : "Update Password"}
-                  </button>
-                </form>
-              )}
-            </div>
-          </div>
-        )}
-
         {/* --- Standard Login Modal --- */}
-        {showAuthModal && !resetMode && (
+        {showAuthModal && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/10 dark:bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
             <div className={`w-full max-w-[400px] bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/10 rounded-3xl p-8 shadow-2xl relative animate-in zoom-in-[0.98] duration-300`}>
               <button
@@ -220,7 +140,7 @@ function App() {
         )}
 
         <div className="relative max-w-[640px] mx-auto px-6 py-16 md:py-24">
-          <nav className={`flex justify-between items-center mb-24 gap-4 z-50 transition-all`}>
+          <nav className={`flex justify-between items-center mb-20 gap-4 z-50 transition-all px-6 py-4 rounded-2xl border backdrop-blur-md shadow-sm ${isDarkMode ? 'bg-[#1A1A1A]/80 border-white/10' : 'bg-white/80 border-black/5'}`}>
             <div className="cursor-default select-none shrink-0">
               <div className="flex items-center gap-3">
                 <span className={`font-sans font-semibold text-lg tracking-tight`} onClick={() => setView('journal')}>Manas Sontakke</span>
