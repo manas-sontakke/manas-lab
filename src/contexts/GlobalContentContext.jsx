@@ -7,6 +7,9 @@ const GlobalContentContext = createContext();
 const defaultContent = {
     journalIntro: "Hey, I'm Manas. My friends also call me Sontakke. I write about architecture, learning, and the systems I've built.",
     profileBio: "A student at IIT Kanpur. \nPlaying around with systems, code, and digital spaces.",
+    experienceLabel: "EXPERIENCE",
+    projectsLabel: "PROJECTS",
+    profileFooterNote: "For professional links and socials, scroll down to the footer ↓",
     experience: [
         { id: '1', years: '2022 — 2026', title: 'IIT Kanpur', description: 'B.S in Mathematics and Scientific Computing.' },
         { id: '2', years: '2024', title: 'Startups & Ventures', description: 'Building products in the 0-1 phase.' }

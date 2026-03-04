@@ -48,7 +48,6 @@
 @layer base {
   html {
     background-color: #F4F1EA;
-    overscroll-behavior: none;
   }
 
   .dark html,
@@ -60,7 +59,6 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: inherit;
-    overscroll-behavior: none;
   }
 }
 

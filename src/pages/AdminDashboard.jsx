@@ -93,6 +93,40 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                     />
                 </section>
 
+                {/* Outdoor Section Labels */}
+                <section className={cardClasses}>
+                    <h3 className={labelClasses}>OUTDOOR SECTION SETTINGS</h3>
+                    <div className="space-y-4">
+                        <div>
+                            <label className={`${UI.mono} text-zinc-500 text-[10px] mb-1 block`}>Experience Section Label</label>
+                            <input
+                                className={inputClasses}
+                                value={formData.experienceLabel || ''}
+                                onChange={e => setFormData({ ...formData, experienceLabel: e.target.value })}
+                                placeholder="e.g. EXPERIENCE"
+                            />
+                        </div>
+                        <div>
+                            <label className={`${UI.mono} text-zinc-500 text-[10px] mb-1 block`}>Projects Section Label</label>
+                            <input
+                                className={inputClasses}
+                                value={formData.projectsLabel || ''}
+                                onChange={e => setFormData({ ...formData, projectsLabel: e.target.value })}
+                                placeholder="e.g. PROJECTS"
+                            />
+                        </div>
+                        <div>
+                            <label className={`${UI.mono} text-zinc-500 text-[10px] mb-1 block`}>Footer Note (shown below bio)</label>
+                            <input
+                                className={inputClasses}
+                                value={formData.profileFooterNote || ''}
+                                onChange={e => setFormData({ ...formData, profileFooterNote: e.target.value })}
+                                placeholder="e.g. For professional links, scroll down to the footer ↓"
+                            />
+                        </div>
+                    </div>
+                </section>
+
                 {/* Experience */}
                 <section className={cardClasses}>
                     <div className="flex justify-between items-center mb-6">
@@ -117,14 +151,21 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                 <section className={cardClasses}>
                     <div className="flex justify-between items-center mb-6">
                         <h3 className={`${UI.mono} text-zinc-400 m-0`}>PROJECTS</h3>
-                        <button type="button" onClick={() => addArrayItem('projects', { title: '', description: '' })} className="text-zinc-500 hover:text-black dark:hover:text-white"><Plus className="w-4 h-4" /></button>
+                        <button type="button" onClick={() => addArrayItem('projects', { title: '', description: '', longDescription: '', githubUrl: '', liveUrl: '' })} className="text-zinc-500 hover:text-black dark:hover:text-white"><Plus className="w-4 h-4" /></button>
                     </div>
                     <div className="space-y-6">
                         {(formData.projects || []).map((proj, idx) => (
                             <div key={proj.id || idx} className="flex gap-3 md:gap-6 items-start border-l-2 border-black/5 dark:border-white/5 pl-4">
-                                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <input placeholder="Title" className={`${inputClasses} md:col-span-1`} value={proj.title} onChange={e => updateArray('projects', idx, 'title', e.target.value)} />
-                                    <input placeholder="Description" className={`${inputClasses} md:col-span-2`} value={proj.description} onChange={e => updateArray('projects', idx, 'description', e.target.value)} />
+                                <div className="flex-1 space-y-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <input placeholder="Title" className={`${inputClasses} md:col-span-1`} value={proj.title} onChange={e => updateArray('projects', idx, 'title', e.target.value)} />
+                                        <input placeholder="Short Description" className={`${inputClasses} md:col-span-2`} value={proj.description} onChange={e => updateArray('projects', idx, 'description', e.target.value)} />
+                                    </div>
+                                    <textarea placeholder="Long Description (shown on project page, use ## for headings)" className={`${inputClasses} resize-none h-20`} value={proj.longDescription || ''} onChange={e => updateArray('projects', idx, 'longDescription', e.target.value)} />
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <input placeholder="GitHub URL (optional)" className={inputClasses} value={proj.githubUrl || ''} onChange={e => updateArray('projects', idx, 'githubUrl', e.target.value)} />
+                                        <input placeholder="Live Demo URL (optional)" className={inputClasses} value={proj.liveUrl || ''} onChange={e => updateArray('projects', idx, 'liveUrl', e.target.value)} />
+                                    </div>
                                 </div>
                                 <button type="button" onClick={() => removeArrayItem('projects', idx)} className="text-zinc-400 hover:text-red-500 pt-2 shrink-0"><Trash2 className="w-4 h-4" /></button>
                             </div>

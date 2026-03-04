@@ -107,7 +107,7 @@ function App() {
     }, [location.pathname, location.key]);
 
     return (
-      <div className={`min-h-screen transition-colors duration-500 font-sans ${themeColors.bg} ${themeColors.textMain} selection:bg-black selection:text-white ${isDarkMode ? 'dark' : ''}`}>
+      <div className={`min-h-screen transition-colors duration-500 font-sans ${themeColors.bg} ${themeColors.textMain} selection:bg-black selection:text-white ${isDarkMode ? 'dark' : ''} overflow-x-hidden`}>
 
         {/* --- Standard Login Modal --- */}
         {showAuthModal && (
@@ -143,7 +143,7 @@ function App() {
             onClick={() => {
               signOut(auth).then(() => { setIsAdmin(false); setView('journal'); });
             }}
-            className="fixed bottom-6 left-6 z-[150] flex items-center gap-3 px-5 py-2.5 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 border border-red-500/20 backdrop-blur-md shadow-lg group"
+            className="fixed bottom-6 left-6 z-[9999] flex items-center gap-3 px-5 py-2.5 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 border border-red-500/20 backdrop-blur-md shadow-lg group"
             title="Click to exit Admin Mode"
           >
             <span className="w-2.5 h-2.5 rounded-full bg-red-500 group-hover:bg-white animate-pulse transition-colors" />
@@ -163,16 +163,19 @@ function App() {
         <div className={`fixed inset-0 z-[190] pointer-events-none transition-all duration-1000 ${isAdmin ? 'bg-emerald-500/0 mix-blend-overlay' : 'bg-black/0'}`} />
 
         <div className="relative max-w-[640px] mx-auto px-6 py-16 md:py-24">
-          <nav className={`flex justify-between items-center mb-20 gap-2 md:gap-4 z-50 transition-all px-4 md:px-6 py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'}`}>
-            <div className="cursor-pointer select-none shrink-0 truncate max-w-[120px] md:max-w-none">
-              <div className="flex items-center gap-3">
-                <span className={`font-sans font-semibold text-lg md:text-lg tracking-tight`} onClick={() => { setView('journal'); navigate('/'); }}>Manas Sontakke</span>
-              </div>
+          <nav className={`flex justify-between items-center mb-20 gap-2 md:gap-4 z-50 transition-all px-3 md:px-6 py-3 md:py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'} overflow-hidden`}>
+            <div className="cursor-pointer select-none shrink-0">
+              <span className={`font-sans font-semibold text-base md:text-lg tracking-tight`} onClick={() => { setView('journal'); navigate('/'); }}>Manas Sontakke</span>
             </div>
-            <div className="flex items-center gap-3 md:gap-6 relative z-10 shrink-0">
-              <div className={`flex gap-3 md:gap-4`}>
+            <div className="flex items-center gap-2 md:gap-6 relative z-10 shrink-0">
+              <div className={`flex gap-2 md:gap-4`}>
                 {isAdmin && (
-                  <button onClick={() => { setView('dashboard'); navigate('/'); }} className={`${UI.label} transition-colors ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Dashboard</button>
+                  <button onClick={() => { setView('dashboard'); navigate('/'); }} className={`${UI.label} transition-colors hidden md:block ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Dashboard</button>
+                )}
+                {isAdmin && (
+                  <button onClick={() => { setView('dashboard'); navigate('/'); }} className={`md:hidden ${UI.label} transition-colors ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>
+                    <Terminal className="w-4 h-4" />
+                  </button>
                 )}
                 <button onClick={() => { setView('journal'); navigate('/'); }} className={`${UI.label} transition-colors ${view === 'journal' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Indoor</button>
                 <button onClick={() => { setView('profile'); navigate('/'); }} className={`${UI.label} transition-colors ${view === 'profile' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Outdoor</button>
@@ -216,9 +219,9 @@ function App() {
             </Routes>
           </div>
 
-          <footer className={`mt-16 pt-10 border-t ${isDarkMode ? 'border-white/15' : 'border-black/10'} pb-12 flex flex-col items-center md:items-start justify-between gap-12 relative z-10`}>
+          <footer className={`mt-16 pt-10 border-t ${isDarkMode ? 'border-white/15' : 'border-black/10'} pb-12 flex flex-col items-center md:items-start justify-between gap-6 relative z-10`}>
             {/* Contact Card */}
-            <div className="relative w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 glass-texture shadow-sm mb-8 overflow-hidden group">
+            <div className="relative w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 glass-texture shadow-sm mb-2 overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/0 to-emerald-500/5 dark:from-white/0 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
               <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain} relative z-10`}>Have something to say? Send me an email.</span>
