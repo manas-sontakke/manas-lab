@@ -15,22 +15,17 @@ export default function Journal({ isAdmin, isDarkMode }) {
 
   // Pick up edit state passed from BlogPost page
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    if (params.has('edit') && isAdmin) {
-      const editData = sessionStorage.getItem('editBlog');
-      if (editData) {
-        try {
-          const blog = JSON.parse(editData);
-          setNewBlog({ title: blog.title || '', excerpt: blog.excerpt || '', content: blog.content || '' });
-          setEditingId(blog.id);
-          setSubView('write');
-          sessionStorage.removeItem('editBlog');
-          // Clean the URL
-          navigate('/', { replace: true });
-        } catch (e) { console.error('[Journal] edit parse error', e); }
-      }
+    const editData = sessionStorage.getItem('editBlog');
+    if (editData && isAdmin) {
+      try {
+        const blog = JSON.parse(editData);
+        setNewBlog({ title: blog.title || '', excerpt: blog.excerpt || '', content: blog.content || '' });
+        setEditingId(blog.id);
+        setSubView('write');
+        sessionStorage.removeItem('editBlog');
+      } catch (e) { console.error('[Journal] edit parse error', e); }
     }
-  }, [location.search, isAdmin]);
+  }, [isAdmin]);
 
   // Writing State
   const [newBlog, setNewBlog] = useState({ title: '', excerpt: '', content: '' });
@@ -80,9 +75,11 @@ export default function Journal({ isAdmin, isDarkMode }) {
         readTime: `${Math.max(1, Math.ceil(newBlog.content.split(' ').length / 200))} MIN`,
       };
 
-      if (editingId) {
+      if (editingId && !editingId.startsWith('s')) {
+        // Existing Firestore blog — update in place
         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', editingId), { ...blogData, updatedAt: serverTimestamp() });
       } else {
+        // New blog OR editing a static blog (which doesn't exist in Firestore) — create new
         blogData.date = new Date().toLocaleDateString('en-GB', { month: '2-digit', year: 'numeric' }).replace('/', ' · ');
         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'blogs'), { ...blogData, createdAt: serverTimestamp() });
       }

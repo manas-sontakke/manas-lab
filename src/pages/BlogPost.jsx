@@ -69,9 +69,8 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
     };
 
     const handleEdit = () => {
-        // Store blog in sessionStorage so Journal can pick it up to edit
         sessionStorage.setItem('editBlog', JSON.stringify(blog));
-        navigate('/?edit=' + id);
+        navigate('/');
     };
 
     if (loading) {
@@ -146,7 +145,7 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
                         )}
                     </div>
                     {/* Admin controls */}
-                    {isAdmin && !blog.id?.startsWith('s') && (
+                    {isAdmin && (
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={handleEdit}
