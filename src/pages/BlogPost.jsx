@@ -5,7 +5,7 @@ import { db, appId } from '../services/firebase';
 import { UI, STATIC_BLOGS } from '../utils/constants';
 import { ArrowLeft, Clock, Trash2, Edit2, ArrowUp } from 'lucide-react';
 
-export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
+export default function BlogPost({ isAdmin, isDarkMode, themeColors, onEditBlog }) {
     const { id } = useParams();
     const navigate = useNavigate();
     const [blog, setBlog] = useState(null);
@@ -69,7 +69,8 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
     };
 
     const handleEdit = () => {
-        navigate('/', { state: { editBlog: blog } });
+        onEditBlog(blog);
+        navigate('/');
     };
 
     if (loading) {

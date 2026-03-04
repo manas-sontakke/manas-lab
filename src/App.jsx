@@ -80,6 +80,7 @@ function App() {
     const scrollPositions = useRef({});
     const [transitionKey, setTransitionKey] = useState(location.key);
     const [transitionClass, setTransitionClass] = useState('page-transition-active');
+    const [editBlogData, setEditBlogData] = useState(null);
 
     // Smooth page transition
     useEffect(() => {
@@ -141,6 +142,7 @@ function App() {
         {isAdmin && (
           <button
             onClick={() => {
+              if (!window.confirm('All saved changes will persist. Are you sure you want to leave the garden?')) return;
               signOut(auth).then(() => { setIsAdmin(false); setView('journal'); });
             }}
             className="fixed bottom-6 left-6 z-[9999] flex items-center gap-3 px-5 py-2.5 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 border border-red-500/20 backdrop-blur-md shadow-lg group"
@@ -197,7 +199,7 @@ function App() {
             <Routes location={location}>
               <Route path="/post/:id" element={
                 <main className="w-full min-h-[50vh]">
-                  <BlogPost isAdmin={isAdmin} isDarkMode={isDarkMode} themeColors={themeColors} />
+                  <BlogPost isAdmin={isAdmin} isDarkMode={isDarkMode} themeColors={themeColors} onEditBlog={setEditBlogData} />
                 </main>
               } />
               <Route path="/project/:id" element={
@@ -210,7 +212,7 @@ function App() {
                   {view === 'dashboard' && isAdmin ? (
                     <AdminDashboard themeColors={themeColors} isDarkMode={isDarkMode} />
                   ) : view === 'journal' ? (
-                    <Journal isAdmin={isAdmin} isDarkMode={isDarkMode} />
+                    <Journal isAdmin={isAdmin} isDarkMode={isDarkMode} editBlogData={editBlogData} clearEditBlog={() => setEditBlogData(null)} />
                   ) : (
                     <Profile isDarkMode={isDarkMode} />
                   )}

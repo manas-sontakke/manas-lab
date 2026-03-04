@@ -1,40 +1,78 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { collection, addDoc, onSnapshot, query, serverTimestamp, deleteDoc, updateDoc, doc } from 'firebase/firestore';
 import { db, appId } from '../services/firebase';
 import { UI, STATIC_BLOGS } from '../utils/constants';
-import { Plus, X, Clock, ArrowRight, Trash2, Edit2, Database, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Plus, X, Clock, ArrowRight, Trash2, Edit2, Database, AlertCircle, CheckCircle2, ArrowLeft, Archive, Eye } from 'lucide-react';
 import { useGlobalContent } from '../contexts/GlobalContentContext';
 
-export default function Journal({ isAdmin, isDarkMode }) {
+export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBlog }) {
   const { content } = useGlobalContent();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check if we arrived here with edit data from BlogPost
-  const incomingEdit = location.state?.editBlog;
+  // --- EDIT STATE (lifted from InnerApp to survive remounts) ---
+  const hasConsumedEdit = useRef(false);
 
-  const [subView, setSubView] = useState(() => (incomingEdit && isAdmin) ? 'write' : 'archive');
-  const [blogs, setBlogs] = useState([]);
+  const [subView, setSubView] = useState(() => {
+    if (editBlogData && isAdmin && !hasConsumedEdit.current) return 'write';
+    return 'archive';
+  });
 
-  // Writing State — initialize from incoming edit if present
-  const [newBlog, setNewBlog] = useState(() =>
-    (incomingEdit && isAdmin)
-      ? { title: incomingEdit.title || '', excerpt: incomingEdit.excerpt || '', content: incomingEdit.content || '' }
-      : { title: '', excerpt: '', content: '' }
-  );
-  const [editingId, setEditingId] = useState(() => (incomingEdit && isAdmin) ? incomingEdit.id : null);
+  const [newBlog, setNewBlog] = useState(() => {
+    if (editBlogData && isAdmin && !hasConsumedEdit.current) {
+      return { title: editBlogData.title || '', excerpt: editBlogData.excerpt || '', content: editBlogData.content || '' };
+    }
+    return { title: '', excerpt: '', content: '' };
+  });
+
+  const [editingId, setEditingId] = useState(() => {
+    if (editBlogData && isAdmin && !hasConsumedEdit.current) {
+      hasConsumedEdit.current = true;
+      return editBlogData.id;
+    }
+    return null;
+  });
+
+  // Clear the parent edit state after consuming
+  useEffect(() => {
+    if (editBlogData && hasConsumedEdit.current && clearEditBlog) {
+      clearEditBlog();
+    }
+  }, [editBlogData, clearEditBlog]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMsg, setStatusMsg] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
 
-  // Clear navigation state after consuming it (prevents re-editing on refresh)
+  // Track unsaved changes
+  const isDirty = useRef(false);
   useEffect(() => {
-    if (incomingEdit && isAdmin) {
-      window.history.replaceState({}, '');
-    }
+    isDirty.current = subView === 'write' && (newBlog.title.trim() !== '' || newBlog.content.trim() !== '');
+  }, [newBlog, subView]);
+
+  // Warn on browser tab close/refresh with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isDirty.current) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, []);
 
+  // Helper: confirm before discarding unsaved edits
+  const confirmDiscard = () => {
+    if (isDirty.current) {
+      return window.confirm('You have unsaved changes. Discard them?');
+    }
+    return true;
+  };
+
   // Sync Data
+  const [blogs, setBlogs] = useState([]);
   const [blogsLoaded, setBlogsLoaded] = useState(false);
   useEffect(() => {
     if (!db) { setBlogsLoaded(true); return; }
@@ -59,7 +97,11 @@ export default function Journal({ isAdmin, isDarkMode }) {
     border: isDarkMode ? 'border-white/10' : 'border-black/10'
   };
 
-  const displayBlogs = [...blogs, ...STATIC_BLOGS];
+  // Public feed: exclude archived blogs
+  const publicBlogs = [...blogs.filter(b => !b.archived), ...STATIC_BLOGS];
+  // Admin: ALL blogs including archived
+  const allBlogs = [...blogs, ...STATIC_BLOGS];
+  const displayBlogs = (isAdmin && showArchived) ? allBlogs : publicBlogs;
 
   // Actions
   const handleSaveBlog = async (e) => {
@@ -80,12 +122,13 @@ export default function Journal({ isAdmin, isDarkMode }) {
         // Existing Firestore blog — update in place
         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', editingId), { ...blogData, updatedAt: serverTimestamp() });
       } else {
-        // New blog OR editing a static blog (which doesn't exist in Firestore) — create new
+        // New blog OR editing a static blog → create new
         blogData.date = new Date().toLocaleDateString('en-GB', { month: '2-digit', year: 'numeric' }).replace('/', ' · ');
         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'blogs'), { ...blogData, createdAt: serverTimestamp() });
       }
       setNewBlog({ title: '', excerpt: '', content: '' });
       setEditingId(null);
+      isDirty.current = false;
       setStatusMsg('success');
       setTimeout(() => { setStatusMsg(null); setSubView('archive'); }, 1500);
     } catch (err) {
@@ -95,9 +138,18 @@ export default function Journal({ isAdmin, isDarkMode }) {
   };
 
   const startEditing = (blog) => {
-    setNewBlog({ title: blog.title, excerpt: blog.excerpt, content: blog.content });
+    setNewBlog({ title: blog.title, excerpt: blog.excerpt || '', content: blog.content || '' });
     setEditingId(blog.id);
     setSubView('write');
+  };
+
+  const toggleArchive = async (blog) => {
+    if (!db || blog.id?.startsWith('s')) return;
+    try {
+      await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', blog.id), { archived: !blog.archived });
+    } catch (err) {
+      console.error("[Journal] Archive toggle error:", err);
+    }
   };
 
   // --- RENDERING ---
@@ -109,7 +161,7 @@ export default function Journal({ isAdmin, isDarkMode }) {
         <div className="max-w-[720px] mx-auto animate-in slide-in-from-bottom-8 md:py-12">
           <div className="flex justify-between items-center mb-16">
             <span className={`${UI.mono} text-zinc-400`}>{editingId ? 'EDITING ENTRY' : 'NEW ENTRY'}</span>
-            <button onClick={() => setSubView('archive')} className={`${UI.mono} ${UI.linkHover} text-zinc-400`}>CANCEL</button>
+            <button onClick={() => { if (confirmDiscard()) { setSubView('archive'); setEditingId(null); setNewBlog({ title: '', excerpt: '', content: '' }); isDirty.current = false; } }} className={`${UI.mono} ${UI.linkHover} text-zinc-400`}>CANCEL</button>
           </div>
           <form onSubmit={handleSaveBlog} className="space-y-12">
             <input type="text" placeholder="Title..." value={newBlog.title} onChange={e => setNewBlog({ ...newBlog, title: e.target.value })} className={`w-full text-4xl md:text-[3.2rem] ${UI.serif} leading-[1.15] tracking-tight bg-transparent focus:bg-transparent border-none outline-none placeholder:opacity-20 ${themeColors.textMain}`} />
@@ -122,7 +174,7 @@ export default function Journal({ isAdmin, isDarkMode }) {
             </div>
             <div className={`flex justify-end border-t ${themeColors.border} pt-8`}>
               <button disabled={isSubmitting} className={`px-8 py-3 bg-[#1A1A1A] dark:bg-white text-white dark:text-[#1A1A1A] ${UI.label} hover:opacity-80 transition-opacity rounded-full`}>
-                {statusMsg === 'syncing' ? 'Publishing...' : statusMsg === 'success' ? 'Published' : 'Publish Entry'}
+                {statusMsg === 'syncing' ? 'Publishing...' : statusMsg === 'success' ? 'Published' : editingId ? 'Update Entry' : 'Publish Entry'}
               </button>
             </div>
           </form>
@@ -136,7 +188,15 @@ export default function Journal({ isAdmin, isDarkMode }) {
               </h1>
             </div>
             {isAdmin && (
-              <div className="flex gap-4">
+              <div className="flex gap-3 items-center">
+                <button
+                  onClick={() => setShowArchived(!showArchived)}
+                  title={showArchived ? "Hide archived" : "Show archived"}
+                  className={`flex items-center gap-1.5 ${UI.mono} text-[10px] px-3 py-1.5 rounded-full border transition-colors ${showArchived ? 'border-amber-500/30 text-amber-500 bg-amber-500/10' : 'border-black/10 dark:border-white/10 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}
+                >
+                  <Archive className="w-3 h-3" />
+                  {showArchived ? 'ALL' : 'PUBLIC'}
+                </button>
                 <button onClick={() => { setNewBlog({ title: '', excerpt: '', content: '' }); setEditingId(null); setSubView('write'); }} className={`flex items-center gap-2 ${UI.label} px-4 py-2 bg-[#1A1A1A] dark:bg-white/10 text-white dark:text-zinc-200 hover:opacity-80 transition-opacity rounded-full`}><Plus className="w-4 h-4" /> New</button>
               </div>
             )}
@@ -154,9 +214,24 @@ export default function Journal({ isAdmin, isDarkMode }) {
                   <div
                     key={blog.id}
                     onClick={() => navigate(`/post/${blog.id}`)}
-                    className={`group flex flex-col items-start gap-1.5 cursor-pointer py-4 px-2 md:px-4 rounded-xl transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02] ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-8 mb-4' : ''}`}
+                    className={`group flex flex-col items-start gap-1.5 cursor-pointer py-4 px-2 md:px-4 rounded-xl transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02] ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-8 mb-4' : ''} ${blog.archived ? 'opacity-50' : ''}`}
                   >
-                    <h4 className={`font-serif md:text-[1.5rem] text-[1.3rem] leading-tight ${themeColors.textMain} group-hover:opacity-60 transition-opacity`}>{blog.title}</h4>
+                    <div className="flex items-center gap-2 w-full">
+                      <h4 className={`font-serif md:text-[1.5rem] text-[1.3rem] leading-tight ${themeColors.textMain} group-hover:opacity-60 transition-opacity flex-1`}>{blog.title}</h4>
+                      {/* Admin: archive toggle */}
+                      {isAdmin && !blog.id?.startsWith('s') && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleArchive(blog); }}
+                          title={blog.archived ? "Unarchive (make public)" : "Archive (hide from public)"}
+                          className={`shrink-0 p-1.5 rounded-lg transition-colors ${blog.archived ? 'text-amber-500 hover:bg-amber-500/10' : 'text-zinc-300 dark:text-zinc-700 hover:text-zinc-500 dark:hover:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/5'}`}
+                        >
+                          {blog.archived ? <Eye className="w-4 h-4" /> : <Archive className="w-4 h-4" />}
+                        </button>
+                      )}
+                    </div>
+                    {blog.archived && isAdmin && (
+                      <span className="font-mono text-[10px] text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">ARCHIVED</span>
+                    )}
                     {blog.excerpt && <p className={`font-sans text-[1rem] ${themeColors.textSub} line-clamp-2 mt-1 mb-2 leading-relaxed`}>{blog.excerpt}</p>}
                     <div className="flex items-center gap-3 font-sans text-sm text-zinc-500 mt-1">
                       <span>{blog.date}</span>
