@@ -99,7 +99,7 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
 
     // Parse paragraphs for Medium-style rendering
     const paragraphs = blog.content
-        ? blog.content.split('\n').filter(p => p.trim() !== '')
+        ? blog.content.split('\n')
         : ['No content yet.'];
 
     return (
@@ -174,6 +174,8 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
                 {/* Body — Medium-style reading experience */}
                 <div className={`font-serif text-[1.15rem] md:text-[1.25rem] leading-[1.85] tracking-[-0.005em] ${isDarkMode ? 'text-[#DEDEDE]' : 'text-[#1A1A1A]'} space-y-7`}>
                     {paragraphs.map((para, i) => {
+                        if (para.trim() === '') return <div key={i} className="h-4" aria-hidden="true" />;
+
                         // H2-style headings: lines starting with ## 
                         if (para.startsWith('## ')) {
                             return (

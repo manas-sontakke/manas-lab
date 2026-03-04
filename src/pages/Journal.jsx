@@ -78,12 +78,12 @@ export default function Journal({ isAdmin, isDarkMode }) {
       const blogData = {
         ...newBlog,
         readTime: `${Math.max(1, Math.ceil(newBlog.content.split(' ').length / 200))} MIN`,
-        date: new Date().toLocaleDateString('en-GB', { month: '2-digit', year: 'numeric' }).replace('/', ' · '),
       };
 
       if (editingId) {
         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', editingId), { ...blogData, updatedAt: serverTimestamp() });
       } else {
+        blogData.date = new Date().toLocaleDateString('en-GB', { month: '2-digit', year: 'numeric' }).replace('/', ' · ');
         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'blogs'), { ...blogData, createdAt: serverTimestamp() });
       }
       setNewBlog({ title: '', excerpt: '', content: '' });
@@ -116,7 +116,12 @@ export default function Journal({ isAdmin, isDarkMode }) {
           <form onSubmit={handleSaveBlog} className="space-y-12">
             <input type="text" placeholder="Title..." value={newBlog.title} onChange={e => setNewBlog({ ...newBlog, title: e.target.value })} className={`w-full text-4xl md:text-[3.2rem] ${UI.serif} leading-[1.15] tracking-tight bg-transparent focus:bg-transparent border-none outline-none placeholder:opacity-20 ${themeColors.textMain}`} />
             <textarea placeholder="Excerpt..." value={newBlog.excerpt} onChange={e => setNewBlog({ ...newBlog, excerpt: e.target.value })} className={`w-full p-0 bg-transparent focus:bg-transparent text-[1.1rem] ${UI.sans} outline-none resize-none h-24 ${themeColors.textSub} transition-all`} />
-            <textarea placeholder="Write your thoughts..." value={newBlog.content} onChange={e => setNewBlog({ ...newBlog, content: e.target.value })} className={`w-full p-0 bg-transparent focus:bg-transparent text-[1.25rem] md:text-[1.35rem] font-serif leading-[1.8] tracking-[-0.01em] outline-none h-[60vh] resize-none ${themeColors.textMain} custom-scrollbar`} />
+            <div className="relative">
+              <div className={`absolute -top-6 right-0 font-mono text-[10px] text-zinc-400 p-1.5 opacity-60 pointer-events-none`}>
+                TIP: Start lines with "## " for headings or "&gt; " for quotes
+              </div>
+              <textarea placeholder="Write your thoughts..." value={newBlog.content} onChange={e => setNewBlog({ ...newBlog, content: e.target.value })} className={`w-full p-0 bg-transparent focus:bg-transparent text-[1.25rem] md:text-[1.35rem] font-serif leading-[1.8] tracking-[-0.01em] outline-none h-[60vh] resize-none overflow-y-auto ${themeColors.textMain} custom-scrollbar`} />
+            </div>
             <div className={`flex justify-end border-t ${themeColors.border} pt-8`}>
               <button disabled={isSubmitting} className={`px-8 py-3 bg-[#1A1A1A] dark:bg-white text-white dark:text-[#1A1A1A] ${UI.label} hover:opacity-80 transition-opacity rounded-full`}>
                 {statusMsg === 'syncing' ? 'Publishing...' : statusMsg === 'success' ? 'Published' : 'Publish Entry'}
@@ -146,12 +151,12 @@ export default function Journal({ isAdmin, isDarkMode }) {
                 {[1, 2, 3].map(i => <div key={i} className="h-16 bg-black/[0.03] dark:bg-white/[0.03] rounded-xl" />)}
               </div>
             ) : (
-              <div className={`flex flex-col gap-10 mt-8 mb-12`}>
+              <div className={`flex flex-col glass-texture border border-black/5 dark:border-white/10 rounded-2xl p-4 md:p-6 shadow-sm`}>
                 {displayBlogs.map((blog, idx) => (
                   <div
                     key={blog.id}
                     onClick={() => navigate(`/post/${blog.id}`)}
-                    className={`group flex flex-col items-start gap-1.5 cursor-pointer py-2 ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-10' : ''}`}
+                    className={`group flex flex-col items-start gap-1.5 cursor-pointer py-4 px-2 md:px-4 rounded-xl transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02] ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-8 mb-4' : ''}`}
                   >
                     <h4 className={`font-serif md:text-[1.5rem] text-[1.3rem] leading-tight ${themeColors.textMain} group-hover:opacity-60 transition-opacity`}>{blog.title}</h4>
                     {blog.excerpt && <p className={`font-sans text-[1rem] ${themeColors.textSub} line-clamp-2 mt-1 mb-2 leading-relaxed`}>{blog.excerpt}</p>}
