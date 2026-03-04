@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { onAuthStateChanged, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { auth, isConfigValid } from './services/firebase';
 import { UI } from './utils/constants';
-import Journal from './pages/Journal'; // Maps to "Indoor"
-import Profile from './pages/Profile'; // Maps to "Outdoor"
+import Journal from './pages/Journal';
+import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
+import BlogPost from './pages/BlogPost';
+import ProjectDetail from './pages/ProjectDetail';
 import { GlobalContentProvider, useGlobalContent } from './contexts/GlobalContentContext';
 import {
   Sun, Moon, X, AlertCircle, RefreshCcw, Lock,
@@ -13,7 +16,7 @@ import {
 
 function App() {
   const [view, setView] = useState('journal');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState(null);
 
@@ -63,15 +66,46 @@ function App() {
   const themeColors = {
     bg: isDarkMode ? 'bg-[#151515]' : 'bg-[#F4F1EA]',
     textMain: isDarkMode ? 'text-[#EDEDED]' : 'text-[#232323]',
-    textSub: isDarkMode ? 'text-zinc-500' : 'text-[#5A5A5A]',
+    textSub: isDarkMode ? 'text-zinc-400' : 'text-[#666666]',
     navBg: isDarkMode ? 'bg-[#151515]/80 border-white/10' : 'bg-[#F4F1EA]/80 border-black/5',
-    border: isDarkMode ? 'border-white/10' : 'border-black/5'
+    border: isDarkMode ? 'border-white/15' : 'border-black/10'
   };
 
   if (!isConfigValid) return <div className="p-10 font-mono text-red-500">CONFIG ERROR: CHECK .ENV</div>;
 
   const InnerApp = () => {
     const { content } = useGlobalContent();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const scrollPositions = useRef({});
+    const [transitionKey, setTransitionKey] = useState(location.key);
+    const [transitionClass, setTransitionClass] = useState('page-transition-active');
+
+    // Smooth page transition
+    useEffect(() => {
+      setTransitionClass('page-transition-enter');
+      const timer = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setTransitionClass('page-transition-active'));
+      });
+
+      const isDetailPage = location.pathname.startsWith('/post/') || location.pathname.startsWith('/project/');
+
+      if (isDetailPage) {
+        scrollPositions.current['/'] = window.scrollY;
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      } else {
+        const saved = scrollPositions.current[location.pathname];
+        if (saved != null) {
+          requestAnimationFrame(() => window.scrollTo({ top: saved, behavior: 'instant' }));
+        } else {
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        }
+      }
+
+      setTransitionKey(location.key);
+      return () => cancelAnimationFrame(timer);
+    }, [location.pathname, location.key]);
+
     return (
       <div className={`min-h-screen transition-colors duration-500 font-sans ${themeColors.bg} ${themeColors.textMain} selection:bg-black selection:text-white ${isDarkMode ? 'dark' : ''}`}>
 
@@ -130,18 +164,18 @@ function App() {
 
         <div className="relative max-w-[640px] mx-auto px-6 py-16 md:py-24">
           <nav className={`flex justify-between items-center mb-20 gap-2 md:gap-4 z-50 transition-all px-4 md:px-6 py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'}`}>
-            <div className="cursor-default select-none shrink-0 truncate max-w-[120px] md:max-w-none">
+            <div className="cursor-pointer select-none shrink-0 truncate max-w-[120px] md:max-w-none">
               <div className="flex items-center gap-3">
-                <span className={`font-sans font-semibold text-lg md:text-lg tracking-tight`} onClick={() => setView('journal')}>Manas Sontakke</span>
+                <span className={`font-sans font-semibold text-lg md:text-lg tracking-tight`} onClick={() => { setView('journal'); navigate('/'); }}>Manas Sontakke</span>
               </div>
             </div>
             <div className="flex items-center gap-3 md:gap-6 relative z-10 shrink-0">
               <div className={`flex gap-3 md:gap-4`}>
                 {isAdmin && (
-                  <button onClick={() => setView('dashboard')} className={`${UI.label} transition-colors ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Dashboard</button>
+                  <button onClick={() => { setView('dashboard'); navigate('/'); }} className={`${UI.label} transition-colors ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Dashboard</button>
                 )}
-                <button onClick={() => setView('journal')} className={`${UI.label} transition-colors ${view === 'journal' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Indoor</button>
-                <button onClick={() => setView('profile')} className={`${UI.label} transition-colors ${view === 'profile' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Outdoor</button>
+                <button onClick={() => { setView('journal'); navigate('/'); }} className={`${UI.label} transition-colors ${view === 'journal' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Indoor</button>
+                <button onClick={() => { setView('profile'); navigate('/'); }} className={`${UI.label} transition-colors ${view === 'profile' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Outdoor</button>
               </div>
               <div className="w-px h-4 bg-zinc-300 dark:bg-zinc-800"></div>
               <button
@@ -156,20 +190,35 @@ function App() {
             </div>
           </nav>
 
-          <main key={view} className="w-full min-h-[50vh] animate-in fade-in slide-in-from-bottom-2 duration-500 will-change-transform">
-            {view === 'dashboard' && isAdmin ? (
-              <AdminDashboard themeColors={themeColors} isDarkMode={isDarkMode} />
-            ) : view === 'journal' ? (
-              <Journal isAdmin={isAdmin} isDarkMode={isDarkMode} />
-            ) : (
-              <Profile isDarkMode={isDarkMode} />
-            )}
-          </main>
+          <div key={transitionKey} className={transitionClass}>
+            <Routes location={location}>
+              <Route path="/post/:id" element={
+                <main className="w-full min-h-[50vh]">
+                  <BlogPost isAdmin={isAdmin} isDarkMode={isDarkMode} themeColors={themeColors} />
+                </main>
+              } />
+              <Route path="/project/:id" element={
+                <main className="w-full min-h-[50vh]">
+                  <ProjectDetail isDarkMode={isDarkMode} themeColors={themeColors} />
+                </main>
+              } />
+              <Route path="*" element={
+                <main key={view} className="w-full min-h-[50vh]">
+                  {view === 'dashboard' && isAdmin ? (
+                    <AdminDashboard themeColors={themeColors} isDarkMode={isDarkMode} />
+                  ) : view === 'journal' ? (
+                    <Journal isAdmin={isAdmin} isDarkMode={isDarkMode} />
+                  ) : (
+                    <Profile isDarkMode={isDarkMode} />
+                  )}
+                </main>
+              } />
+            </Routes>
+          </div>
 
-          <footer className={`mt-16 pt-10 border-t ${themeColors.border} pb-12 flex flex-col items-center md:items-start justify-between gap-12 relative z-10`}>
-            {/* Reangdeba Style Contact Card */}
+          <footer className={`mt-16 pt-10 border-t ${isDarkMode ? 'border-white/15' : 'border-black/10'} pb-12 flex flex-col items-center md:items-start justify-between gap-12 relative z-10`}>
+            {/* Contact Card */}
             <div className="relative w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 glass-texture shadow-sm mb-8 overflow-hidden group">
-              {/* Subtle hover gradient on the contact card */}
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/0 to-emerald-500/5 dark:from-white/0 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
               <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain} relative z-10`}>Have something to say? Send me an email.</span>
@@ -181,14 +230,29 @@ function App() {
             <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-end gap-12 md:gap-6">
               <div className="flex flex-col gap-6 w-full md:w-auto">
                 <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8">
-                  {(content?.socials || []).map((social) => (
-                    <a key={social.platform} href={social.url} target="_blank" rel="noreferrer" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>
-                      {social.platform}
-                    </a>
-                  ))}
-                  <a href="mailto:sontakke.manas@gmail.com" className={`${UI.mono} text-zinc-400 ${UI.linkHover}`}>EMAIL</a>
+                  {/* Show personal socials for Indoor, professional for Outdoor */}
+                  {view === 'journal' ? (
+                    <>
+                      {(content?.socials || []).filter(s => ['INSTAGRAM', 'TWITTER'].includes(s.platform)).map((social) => (
+                        <a key={social.platform} href={social.url} target="_blank" rel="noreferrer" className={`${UI.mono} ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} ${UI.linkHover}`}>
+                          {social.platform}
+                        </a>
+                      ))}
+                      <a href="tel:8291229103" className={`${UI.mono} ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} ${UI.linkHover}`}>PHONE</a>
+                      <a href="mailto:sontakke.manas@gmail.com" className={`${UI.mono} ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} ${UI.linkHover}`}>EMAIL</a>
+                    </>
+                  ) : (
+                    <>
+                      {(content?.socials || []).filter(s => ['GITHUB', 'LINKEDIN'].includes(s.platform)).map((social) => (
+                        <a key={social.platform} href={social.url} target="_blank" rel="noreferrer" className={`${UI.mono} ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} ${UI.linkHover}`}>
+                          {social.platform}
+                        </a>
+                      ))}
+                      <a href="mailto:sontakke.manas@gmail.com" className={`${UI.mono} ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} ${UI.linkHover}`}>EMAIL</a>
+                    </>
+                  )}
                 </div>
-                <p className={`${UI.serif} text-zinc-500 text-sm max-w-sm leading-relaxed text-center md:text-left`}>
+                <p className={`${UI.serif} ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} text-sm max-w-sm leading-relaxed text-center md:text-left`}>
                   This digital space is built using React, structured with Tailwind, and synced via Firebase. Deployed gracefully on Vercel.
                 </p>
               </div>
@@ -202,14 +266,14 @@ function App() {
                         setShowAuthModal(true);
                       }
                     }}
-                    className={`text-zinc-600 dark:text-zinc-500 ${UI.linkHover} transition-colors ${isAdmin ? 'text-red-500 dark:text-red-500 hover:text-red-600' : ''}`}
+                    className={`${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} ${UI.linkHover} transition-colors ${isAdmin ? 'text-red-500 dark:text-red-500 hover:text-red-600' : ''}`}
                     title={isAdmin ? "Log Out" : "System Access"}
                   >
                     <Terminal className="w-4 h-4" />
                   </button>
                 </div>
-                <p className={`${UI.mono} text-zinc-400 mt-4`}>© 2026 MANAS SONTAKKE</p>
-                <p className={`${UI.mono} text-zinc-500 text-[10px]`}>KANPUR, INDIA</p>
+                <p className={`${UI.mono} ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} mt-4`}>© 2026 MANAS SONTAKKE</p>
+                <p className={`${UI.mono} ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'} text-[10px]`}>KANPUR, INDIA</p>
               </div>
             </div>
           </footer>

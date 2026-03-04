@@ -46,10 +46,34 @@
 }
 
 @layer base {
+  html {
+    background-color: #F4F1EA;
+    overscroll-behavior: none;
+  }
+
+  .dark html,
+  html:has(.dark) {
+    background-color: #151515;
+  }
+
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: inherit;
+    overscroll-behavior: none;
   }
+}
+
+/* Smooth page transition wrapper */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-transition-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.35s ease-out, transform 0.35s ease-out;
 }
 
 @layer utilities {

@@ -7,12 +7,16 @@ import { Plus, X, Save, Trash2 } from 'lucide-react';
 
 export default function AdminDashboard({ themeColors, isDarkMode }) {
     const { content, loading } = useGlobalContent();
-    const [formData, setFormData] = useState(content);
+    const [formData, setFormData] = useState(null);
     const [status, setStatus] = useState(null);
+    const hasSynced = React.useRef(false);
 
-    // Sync incoming context to local specific state once loaded
+    // Sync from Firestore exactly once, after data has loaded (not from defaults)
     React.useEffect(() => {
-        if (!loading && Object.keys(formData).length === 0) setFormData(content);
+        if (!loading && content && !hasSynced.current) {
+            setFormData(content);
+            hasSynced.current = true;
+        }
     }, [content, loading]);
 
     const handleSave = async (e) => {
@@ -46,7 +50,7 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
         setFormData({ ...formData, [key]: newArr });
     };
 
-    if (loading) return <div className="animate-pulse w-full h-32 bg-black/5 dark:bg-white/5 rounded-2xl" />;
+    if (loading || !formData) return <div className="animate-pulse w-full h-32 bg-black/5 dark:bg-white/5 rounded-2xl" />;
 
     const inputClasses = `w-full bg-transparent border-b border-black/10 dark:border-white/10 focus:border-black dark:focus:border-white outline-none py-2 ${themeColors.textMain} ${UI.sans} transition-colors`;
     const labelClasses = `${UI.mono} text-zinc-400 mb-2 block`;

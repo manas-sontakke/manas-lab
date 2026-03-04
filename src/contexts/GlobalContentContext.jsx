@@ -47,9 +47,28 @@ export function GlobalContentProvider({ children }) {
         return () => unsubscribe();
     }, []);
 
+    const loadingLines = [
+        "brewing some thoughts...",
+        "untangling digital knots...",
+        "aligning the pixels...",
+        "waking up the garden...",
+        "connecting the constellations...",
+    ];
+
+    const [loadingLine] = useState(() => loadingLines[Math.floor(Math.random() * loadingLines.length)]);
+
     return (
         <GlobalContentContext.Provider value={{ content, loading }}>
-            {children}
+            {loading ? (
+                <div className="min-h-screen flex flex-col items-center justify-center bg-[#F4F1EA] dark:bg-[#151515] transition-opacity duration-500">
+                    <div className="flex flex-col items-center gap-6 animate-in fade-in duration-700">
+                        <div className="w-5 h-5 border-2 border-black/15 dark:border-white/15 border-t-black/60 dark:border-t-white/60 rounded-full animate-spin" />
+                        <p className="font-serif text-sm text-black/40 dark:text-white/40 tracking-wide italic">
+                            {loadingLine}
+                        </p>
+                    </div>
+                </div>
+            ) : children}
         </GlobalContentContext.Provider>
     );
 }
