@@ -69,8 +69,7 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
     };
 
     const handleEdit = () => {
-        sessionStorage.setItem('editBlog', JSON.stringify(blog));
-        navigate('/');
+        navigate('/', { state: { editBlog: blog } });
     };
 
     if (loading) {

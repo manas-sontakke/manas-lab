@@ -10,28 +10,29 @@ export default function Journal({ isAdmin, isDarkMode }) {
   const { content } = useGlobalContent();
   const navigate = useNavigate();
   const location = useLocation();
-  const [subView, setSubView] = useState('archive');
+
+  // Check if we arrived here with edit data from BlogPost
+  const incomingEdit = location.state?.editBlog;
+
+  const [subView, setSubView] = useState(() => (incomingEdit && isAdmin) ? 'write' : 'archive');
   const [blogs, setBlogs] = useState([]);
 
-  // Pick up edit state passed from BlogPost page
-  useEffect(() => {
-    const editData = sessionStorage.getItem('editBlog');
-    if (editData && isAdmin) {
-      try {
-        const blog = JSON.parse(editData);
-        setNewBlog({ title: blog.title || '', excerpt: blog.excerpt || '', content: blog.content || '' });
-        setEditingId(blog.id);
-        setSubView('write');
-        sessionStorage.removeItem('editBlog');
-      } catch (e) { console.error('[Journal] edit parse error', e); }
-    }
-  }, [isAdmin]);
-
-  // Writing State
-  const [newBlog, setNewBlog] = useState({ title: '', excerpt: '', content: '' });
-  const [editingId, setEditingId] = useState(null);
+  // Writing State — initialize from incoming edit if present
+  const [newBlog, setNewBlog] = useState(() =>
+    (incomingEdit && isAdmin)
+      ? { title: incomingEdit.title || '', excerpt: incomingEdit.excerpt || '', content: incomingEdit.content || '' }
+      : { title: '', excerpt: '', content: '' }
+  );
+  const [editingId, setEditingId] = useState(() => (incomingEdit && isAdmin) ? incomingEdit.id : null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMsg, setStatusMsg] = useState(null);
+
+  // Clear navigation state after consuming it (prevents re-editing on refresh)
+  useEffect(() => {
+    if (incomingEdit && isAdmin) {
+      window.history.replaceState({}, '');
+    }
+  }, []);
 
   // Sync Data
   const [blogsLoaded, setBlogsLoaded] = useState(false);
