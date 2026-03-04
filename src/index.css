@@ -70,7 +70,7 @@
 
 .page-transition-active {
   opacity: 1;
-  transform: translateY(0);
+  transform: none;
   transition: opacity 0.35s ease-out, transform 0.35s ease-out;
 }
 

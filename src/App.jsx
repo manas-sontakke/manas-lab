@@ -256,7 +256,7 @@ function App() {
                   )}
                 </div>
                 <p className={`${UI.serif} ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} text-sm max-w-sm leading-relaxed text-center md:text-left`}>
-                  This digital space is built using React, structured with Tailwind, and synced via Firebase. Deployed gracefully on Vercel.
+                  {content?.footerText || "This digital space is built using React, structured with Tailwind, and synced via Firebase. Deployed gracefully on Vercel."}
                 </p>
               </div>
               <div className="flex flex-col items-start md:items-end gap-2">

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../services/firebase';
 import { UI, STATIC_BLOGS } from '../utils/constants';
-import { ArrowLeft, Clock, Trash2, Edit2 } from 'lucide-react';
+import { ArrowLeft, Clock, Trash2, Edit2, ArrowUp } from 'lucide-react';
 
 export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
     const { id } = useParams();
@@ -11,9 +11,10 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
     const [blog, setBlog] = useState(null);
     const [loading, setLoading] = useState(true);
     const [readProgress, setReadProgress] = useState(0);
+    const [showScrollTop, setShowScrollTop] = useState(false);
     const contentRef = useRef(null);
 
-    // Reading progress indicator
+    // Reading progress & scroll to top toggle
     useEffect(() => {
         const handleScroll = () => {
             const el = contentRef.current;
@@ -22,6 +23,7 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
             const docHeight = document.documentElement.scrollHeight - window.innerHeight;
             const progress = docHeight > 0 ? Math.min(100, (scrollTop / docHeight) * 100) : 0;
             setReadProgress(progress);
+            setShowScrollTop(scrollTop > 400);
         };
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
@@ -211,6 +213,14 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors }) {
                         Back to feed
                     </button>
                 </div>
+                {/* Back to top button */}
+                <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className={`fixed bottom-8 right-8 z-[900] p-3 rounded-full bg-black/5 dark:bg-white/10 backdrop-blur-md border border-black/10 dark:border-white/20 text-zinc-500 hover:text-black dark:text-zinc-300 dark:hover:text-white transition-all duration-300 ${showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'} group shadow-sm`}
+                    aria-label="Scroll to top"
+                >
+                    <ArrowUp className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" />
+                </button>
             </article>
         </>
     );

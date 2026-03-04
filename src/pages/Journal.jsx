@@ -146,16 +146,27 @@ export default function Journal({ isAdmin, isDarkMode }) {
                 {[1, 2, 3].map(i => <div key={i} className="h-16 bg-black/[0.03] dark:bg-white/[0.03] rounded-xl" />)}
               </div>
             ) : (
-              <div className={`flex flex-col glass-texture border border-black/5 dark:border-white/10 rounded-2xl p-4 md:p-6 shadow-sm`}>
+              <div className={`flex flex-col gap-10 mt-8 mb-12`}>
                 {displayBlogs.map((blog, idx) => (
                   <div
                     key={blog.id}
                     onClick={() => navigate(`/post/${blog.id}`)}
-                    className={`group py-5 px-4 md:px-6 flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-8 cursor-pointer transition-colors hover:bg-black/[0.02] dark:hover:bg-white/[0.02] rounded-xl ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-6 mb-2' : ''}`}
+                    className={`group flex flex-col items-start gap-1.5 cursor-pointer py-2 ${idx !== displayBlogs.length - 1 ? 'border-b border-black/[0.04] dark:border-white/[0.04] pb-10' : ''}`}
                   >
-                    <span className={`font-sans text-zinc-400 text-sm md:text-[0.95rem] w-24 shrink-0`}>{blog.date}</span>
-                    <h4 className={`font-sans font-medium text-[1rem] md:text-[1.1rem] leading-[1.4] ${themeColors.textMain} flex-1`}>{blog.title}</h4>
-                    <ArrowRight className="w-4 h-4 text-zinc-300 dark:text-zinc-700 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <h4 className={`font-serif md:text-[1.5rem] text-[1.3rem] leading-tight ${themeColors.textMain} group-hover:opacity-60 transition-opacity`}>{blog.title}</h4>
+                    {blog.excerpt && <p className={`font-sans text-[1rem] ${themeColors.textSub} line-clamp-2 mt-1 mb-2 leading-relaxed`}>{blog.excerpt}</p>}
+                    <div className="flex items-center gap-3 font-sans text-sm text-zinc-500 mt-1">
+                      <span>{blog.date}</span>
+                      {blog.readTime && (
+                        <>
+                          <span className="text-zinc-300 dark:text-zinc-700">·</span>
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5" />
+                            {blog.readTime}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

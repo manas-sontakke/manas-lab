@@ -73,7 +73,9 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
             </header>
 
             <form className="space-y-8 pb-16">
-                {/* Intro */}
+
+                {/* --- INDOOR SETTINGS --- */}
+                <h2 className={`${UI.serif} text-2xl ${themeColors.textMain} mt-16 mb-6 pb-3 border-b border-black/10 dark:border-white/10`}>Indoor Settings</h2>
                 <section className={cardClasses}>
                     <h3 className={labelClasses}>JOURNAL INTRO</h3>
                     <textarea
@@ -83,7 +85,8 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                     />
                 </section>
 
-                {/* Bio */}
+                {/* --- OUTDOOR SETTINGS --- */}
+                <h2 className={`${UI.serif} text-2xl ${themeColors.textMain} mt-16 mb-6 pb-3 border-b border-black/10 dark:border-white/10`}>Outdoor Settings</h2>
                 <section className={cardClasses}>
                     <h3 className={labelClasses}>PROFILE BIO</h3>
                     <textarea
@@ -93,41 +96,24 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                     />
                 </section>
 
-                {/* Outdoor Section Labels */}
                 <section className={cardClasses}>
-                    <h3 className={labelClasses}>OUTDOOR SECTION SETTINGS</h3>
+                    <h3 className={labelClasses}>SECTION LABELS & FOOTER</h3>
                     <div className="space-y-4">
                         <div>
                             <label className={`${UI.mono} text-zinc-500 text-[10px] mb-1 block`}>Experience Section Label</label>
-                            <input
-                                className={inputClasses}
-                                value={formData.experienceLabel || ''}
-                                onChange={e => setFormData({ ...formData, experienceLabel: e.target.value })}
-                                placeholder="e.g. EXPERIENCE"
-                            />
+                            <input className={inputClasses} value={formData.experienceLabel || ''} onChange={e => setFormData({ ...formData, experienceLabel: e.target.value })} placeholder="e.g. EXPERIENCE" />
                         </div>
                         <div>
                             <label className={`${UI.mono} text-zinc-500 text-[10px] mb-1 block`}>Projects Section Label</label>
-                            <input
-                                className={inputClasses}
-                                value={formData.projectsLabel || ''}
-                                onChange={e => setFormData({ ...formData, projectsLabel: e.target.value })}
-                                placeholder="e.g. PROJECTS"
-                            />
+                            <input className={inputClasses} value={formData.projectsLabel || ''} onChange={e => setFormData({ ...formData, projectsLabel: e.target.value })} placeholder="e.g. PROJECTS" />
                         </div>
                         <div>
                             <label className={`${UI.mono} text-zinc-500 text-[10px] mb-1 block`}>Footer Note (shown below bio)</label>
-                            <input
-                                className={inputClasses}
-                                value={formData.profileFooterNote || ''}
-                                onChange={e => setFormData({ ...formData, profileFooterNote: e.target.value })}
-                                placeholder="e.g. For professional links, scroll down to the footer ↓"
-                            />
+                            <input className={inputClasses} value={formData.profileFooterNote || ''} onChange={e => setFormData({ ...formData, profileFooterNote: e.target.value })} placeholder="e.g. For professional links, scroll down to the footer ↓" />
                         </div>
                     </div>
                 </section>
 
-                {/* Experience */}
                 <section className={cardClasses}>
                     <div className="flex justify-between items-center mb-6">
                         <h3 className={`${UI.mono} text-zinc-400 m-0`}>EXPERIENCE TIMELINE</h3>
@@ -147,7 +133,6 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                     </div>
                 </section>
 
-                {/* Projects */}
                 <section className={cardClasses}>
                     <div className="flex justify-between items-center mb-6">
                         <h3 className={`${UI.mono} text-zinc-400 m-0`}>PROJECTS</h3>
@@ -173,7 +158,8 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                     </div>
                 </section>
 
-                {/* Socials */}
+                {/* --- GLOBAL SETTINGS --- */}
+                <h2 className={`${UI.serif} text-2xl ${themeColors.textMain} mt-16 mb-6 pb-3 border-b border-black/10 dark:border-white/10`}>Global Settings</h2>
                 <section className={cardClasses}>
                     <div className="flex justify-between items-center mb-6">
                         <h3 className={`${UI.mono} text-zinc-400 m-0`}>SOCIAL LINKS</h3>
@@ -190,6 +176,15 @@ export default function AdminDashboard({ themeColors, isDarkMode }) {
                             </div>
                         ))}
                     </div>
+                </section>
+
+                <section className={cardClasses}>
+                    <h3 className={labelClasses}>GLOBAL FOOTER TEXT</h3>
+                    <textarea
+                        className="w-full bg-transparent outline-none resize-none h-24 font-serif text-[1.1rem] leading-[1.6] text-black dark:text-white"
+                        value={formData.footerText || ''}
+                        onChange={e => setFormData({ ...formData, footerText: e.target.value })}
+                    />
                 </section>
 
             </form>

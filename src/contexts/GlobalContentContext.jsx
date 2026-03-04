@@ -10,6 +10,7 @@ const defaultContent = {
     experienceLabel: "EXPERIENCE",
     projectsLabel: "PROJECTS",
     profileFooterNote: "For professional links and socials, scroll down to the footer ↓",
+    footerText: "This digital space is built using React, structured with Tailwind, and synced via Firebase. Deployed gracefully on Vercel.",
     experience: [
         { id: '1', years: '2022 — 2026', title: 'IIT Kanpur', description: 'B.S in Mathematics and Scientific Computing.' },
         { id: '2', years: '2024', title: 'Startups & Ventures', description: 'Building products in the 0-1 phase.' }
