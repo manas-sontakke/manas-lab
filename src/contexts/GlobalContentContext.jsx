@@ -33,14 +33,21 @@ export function GlobalContentProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [authReady, setAuthReady] = useState(false);
 
-    // Wait for Firebase auth to be ready before trying Firestore
+    // Wait for Firebase auth to resolve to a real user before Firestore reads
     useEffect(() => {
         if (!auth) { setAuthReady(true); setLoading(false); return; }
-        const unsub = onAuthStateChanged(auth, () => {
-            setAuthReady(true);
+        const unsub = onAuthStateChanged(auth, (user) => {
+            // Only ready when we have an actual user (anonymous or Google-signed)
+            if (user) setAuthReady(true);
         });
-        // Timeout fallback: if auth never resolves in 4s, proceed with defaults
-        const timer = setTimeout(() => { setAuthReady(true); }, 4000);
+        // Timeout: if auth never resolves (ad blocker, etc.), proceed with defaults
+        const timer = setTimeout(() => {
+            if (!authReady) {
+                console.warn('[GlobalContent] Auth timeout — proceeding with defaults');
+                setAuthReady(true);
+                setLoading(false);
+            }
+        }, 4000);
         return () => { unsub(); clearTimeout(timer); };
     }, []);
 
