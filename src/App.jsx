@@ -247,11 +247,11 @@ function App() {
 
           <footer className={`mt-16 pt-10 border-t ${isDarkMode ? 'border-white/15' : 'border-black/10'} pb-12 flex flex-col items-center md:items-start justify-between gap-6 relative z-10`}>
             {/* Contact Card */}
-            <div className="relative w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border border-black/5 dark:border-white/10 glass-texture shadow-sm mb-2 overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/0 to-emerald-500/5 dark:from-white/0 dark:to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+            <div className={`relative w-full flex flex-col md:flex-row items-center justify-between p-6 md:p-8 rounded-2xl border glass-texture shadow-sm mb-2 overflow-hidden group ${isDarkMode ? 'border-white/10' : 'border-black/5'}`}>
+              <div className={`absolute inset-0 bg-gradient-to-r ${isDarkMode ? 'from-white/0 to-white/5' : 'from-emerald-500/0 via-emerald-500/0 to-emerald-500/5'} opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none`} />
 
               <span className={`${UI.sans} text-[1.1rem] ${themeColors.textMain} relative z-10`}>Have something to say? Send me an email.</span>
-              <a href="mailto:sontakke.manas@gmail.com" className="relative z-10 mt-4 md:mt-0 px-6 py-2.5 bg-[#8b5cf6] hover:bg-[#7c3aed] text-white rounded-lg font-sans font-medium transition-colors">
+              <a href="mailto:sontakke.manas@gmail.com" className={`relative z-10 mt-4 md:mt-0 px-6 py-2.5 rounded-lg font-sans font-medium transition-colors ${isDarkMode ? 'bg-[#4a6741] hover:bg-[#5a7d4f] text-white' : 'bg-[#3d5a34] hover:bg-[#4a6741] text-white'}`}>
                 Email me →
               </a>
             </div>

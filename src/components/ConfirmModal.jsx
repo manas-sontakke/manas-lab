@@ -28,29 +28,32 @@ export function ConfirmProvider({ children, isDarkMode }) {
         <ConfirmContext.Provider value={confirm}>
             {children}
             {state.show && (
-                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/10 dark:bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onClick={state.onCancel}>
+                <div
+                    className={`fixed inset-0 z-[10000] flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200 ${isDarkMode ? 'bg-black/50' : 'bg-black/10'}`}
+                    onClick={state.onCancel}
+                >
                     <div
-                        className={`w-full max-w-[380px] bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/10 rounded-2xl p-7 shadow-2xl animate-in zoom-in-[0.97] duration-200`}
+                        className={`w-full max-w-[380px] rounded-2xl p-7 shadow-2xl animate-in zoom-in-[0.97] duration-200 ${isDarkMode ? 'bg-[#1A1A1A] border border-white/10' : 'bg-white border border-black/5'}`}
                         onClick={e => e.stopPropagation()}
                     >
-                        <p className={`font-serif text-[1.15rem] leading-[1.5] ${isDarkMode ? 'text-[#EDEDED]' : 'text-[#232323]'} mb-2`}>
+                        <p className={`font-serif text-[1.15rem] leading-[1.5] mb-2 ${isDarkMode ? 'text-[#EDEDED]' : 'text-[#232323]'}`}>
                             {state.message}
                         </p>
                         {state.subtext && (
-                            <p className={`font-sans text-sm ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'} mb-6 leading-relaxed`}>
+                            <p className={`font-sans text-sm mb-6 leading-relaxed ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                                 {state.subtext}
                             </p>
                         )}
                         <div className="flex justify-end gap-3 mt-6">
                             <button
                                 onClick={state.onCancel}
-                                className={`${UI.label} px-5 py-2.5 rounded-full border border-black/10 dark:border-white/10 ${isDarkMode ? 'text-zinc-400 hover:text-white hover:border-white/20' : 'text-zinc-500 hover:text-black hover:border-black/20'} transition-colors`}
+                                className={`${UI.label} px-5 py-2.5 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 text-zinc-400 hover:text-white hover:border-white/20' : 'border-black/10 text-zinc-500 hover:text-black hover:border-black/20'}`}
                             >
                                 {state.cancelLabel}
                             </button>
                             <button
                                 onClick={state.onConfirm}
-                                className={`${UI.label} px-5 py-2.5 rounded-full bg-[#1A1A1A] dark:bg-white text-white dark:text-[#1A1A1A] hover:opacity-80 transition-opacity`}
+                                className={`${UI.label} px-5 py-2.5 rounded-full hover:opacity-80 transition-opacity ${isDarkMode ? 'bg-white text-[#1A1A1A]' : 'bg-[#1A1A1A] text-white'}`}
                             >
                                 {state.confirmLabel}
                             </button>
