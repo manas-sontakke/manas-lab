@@ -82,6 +82,7 @@ function App() {
     const [transitionClass, setTransitionClass] = useState('page-transition-active');
     const [editBlogData, setEditBlogData] = useState(null);
     const confirm = useConfirm();
+    const isDirtyRef = useRef(false); // Global dirty state — set by child components
 
     // Smooth page transition
     useEffect(() => {
@@ -107,17 +108,18 @@ function App() {
       return () => cancelAnimationFrame(timer);
     }, [location.pathname, location.key]);
 
-    // Guarded tab navigation — custom themed modal in admin mode
+    // Guarded tab navigation — only warns if there are actual unsaved changes
     const guardedNavTo = async (targetView) => {
       if (targetView === view) return;
-      if (isAdmin) {
+      if (isAdmin && isDirtyRef.current) {
         const yes = await confirm({
-          message: 'Switch tabs?',
-          subtext: 'Any unsaved changes in your current view won\'t be kept.',
-          confirmLabel: 'Switch',
-          cancelLabel: 'Stay here',
+          message: 'You have unsaved changes.',
+          subtext: 'Switching tabs will discard your current edits.',
+          confirmLabel: 'Discard & switch',
+          cancelLabel: 'Keep editing',
         });
         if (!yes) return;
+        isDirtyRef.current = false;
       }
       setView(targetView);
       navigate('/');
@@ -234,7 +236,7 @@ function App() {
                   {view === 'dashboard' && isAdmin ? (
                     <AdminDashboard themeColors={themeColors} isDarkMode={isDarkMode} />
                   ) : view === 'journal' ? (
-                    <Journal isAdmin={isAdmin} isDarkMode={isDarkMode} editBlogData={editBlogData} clearEditBlog={() => setEditBlogData(null)} />
+                    <Journal isAdmin={isAdmin} isDarkMode={isDarkMode} editBlogData={editBlogData} clearEditBlog={() => setEditBlogData(null)} isDirtyRef={isDirtyRef} />
                   ) : (
                     <Profile isDarkMode={isDarkMode} />
                   )}

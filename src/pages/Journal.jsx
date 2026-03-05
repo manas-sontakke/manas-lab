@@ -7,7 +7,7 @@ import { Plus, Clock, Archive, Eye, RefreshCcw } from 'lucide-react';
 import { useGlobalContent } from '../contexts/GlobalContentContext';
 import { useConfirm } from '../components/ConfirmModal';
 
-export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBlog }) {
+export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBlog, isDirtyRef }) {
   const { content, authReady } = useGlobalContent();
   const navigate = useNavigate();
   const confirm = useConfirm();
@@ -47,11 +47,13 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
     if (consumed.current && clearEditBlog) clearEditBlog();
   }, []);
 
-  // Track unsaved changes for beforeunload
+  // Track unsaved changes — sync to both local ref (beforeunload) and global ref (tab switching)
   const isDirty = useRef(false);
   useEffect(() => {
-    isDirty.current = subView === 'write' && (newBlog.title.trim() !== '' || newBlog.content.trim() !== '');
-  }, [newBlog, subView]);
+    const dirty = subView === 'write' && (newBlog.title.trim() !== '' || newBlog.content.trim() !== '');
+    isDirty.current = dirty;
+    if (isDirtyRef) isDirtyRef.current = dirty;
+  }, [newBlog, subView, isDirtyRef]);
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {

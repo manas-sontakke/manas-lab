@@ -28,7 +28,7 @@ export function ConfirmProvider({ children, isDarkMode }) {
         <ConfirmContext.Provider value={confirm}>
             {children}
             {state.show && (
-                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/10 dark:bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onClick={state.onCancel}>
+                <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/10 dark:bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onClick={state.onCancel}>
                     <div
                         className={`w-full max-w-[380px] bg-white dark:bg-[#1A1A1A] border border-black/5 dark:border-white/10 rounded-2xl p-7 shadow-2xl animate-in zoom-in-[0.97] duration-200`}
                         onClick={e => e.stopPropagation()}
