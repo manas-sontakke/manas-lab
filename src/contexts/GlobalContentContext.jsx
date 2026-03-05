@@ -37,26 +37,24 @@ export function GlobalContentProvider({ children }) {
     useEffect(() => {
         if (!auth) { setAuthReady(true); setLoading(false); return; }
         const unsub = onAuthStateChanged(auth, (user) => {
-            // Only ready when we have an actual user (anonymous or Google-signed)
             if (user) setAuthReady(true);
         });
-        // Timeout: if auth never resolves (ad blocker, etc.), proceed with defaults
+        // Timeout: if auth never resolves, mark ready (Firestore will handle loading)
         const timer = setTimeout(() => {
             if (!authReady) {
                 console.warn('[GlobalContent] Auth timeout — proceeding with defaults');
                 setAuthReady(true);
-                setLoading(false);
             }
         }, 4000);
         return () => { unsub(); clearTimeout(timer); };
     }, []);
 
     // Only connect to Firestore AFTER auth is ready
+    // Loading stays TRUE until Firestore responds — no content flash
     useEffect(() => {
-        if (!authReady || !db) {
-            if (authReady) setLoading(false);
-            return;
-        }
+        if (!authReady) return;
+        if (!db) { setLoading(false); return; }
+
         const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'main');
 
         const unsubscribe = onSnapshot(settingsRef, (docSnap) => {
@@ -68,11 +66,13 @@ export function GlobalContentProvider({ children }) {
             setLoading(false);
         }, (error) => {
             console.error("[GlobalContent] Firestore error:", error);
-            // Fall back to defaults instead of hanging forever
-            setLoading(false);
+            setLoading(false); // Show defaults, no flash since we go straight from spinner to content
         });
 
-        return () => unsubscribe();
+        // Hard timeout: never hang on loading spinner forever
+        const hardTimeout = setTimeout(() => setLoading(false), 8000);
+
+        return () => { unsubscribe(); clearTimeout(hardTimeout); };
     }, [authReady]);
 
     const loadingLines = [

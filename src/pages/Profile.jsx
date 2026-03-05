@@ -20,7 +20,7 @@ export default function Profile({ isDarkMode }) {
     <div className="w-full pb-12">
 
       {/* Header Bio */}
-      <section className="mb-12 mt-4 md:mt-8">
+      <section className="mb-12 mt-4 md:mt-8 px-3">
         <p className={`${UI.serif} text-[1.2rem] leading-[1.7] ${themeColors.textSub} max-w-xl whitespace-pre-wrap`}>
           {content?.profileBio || "A student exploring systems, code, and digital spaces."}
         </p>

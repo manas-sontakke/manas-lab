@@ -235,7 +235,7 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
         </div>
       ) : (
         <div className="animate-in fade-in duration-700 w-full mb-12">
-          <header className="mb-8 flex justify-between items-end gap-8">
+          <header className="mb-8 flex justify-between items-end gap-8 px-3">
             <div className="max-w-xl">
               <h1 className={`${UI.serif} text-[1.35rem] md:text-[1.5rem] leading-[1.65] ${themeColors.textMain} whitespace-pre-wrap`}>
                 {content?.journalIntro || "Welcome to my digital garden."}
