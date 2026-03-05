@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { collection, addDoc, onSnapshot, query, serverTimestamp, deleteDoc, updateDoc, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { collection, addDoc, getDocs, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, updateDoc, doc } from 'firebase/firestore';
 import { db, appId } from '../services/firebase';
-import { UI, STATIC_BLOGS } from '../utils/constants';
-import { Plus, Clock, Archive, Eye } from 'lucide-react';
+import { UI } from '../utils/constants';
+import { Plus, Clock, Archive, Eye, RefreshCcw } from 'lucide-react';
 import { useGlobalContent } from '../contexts/GlobalContentContext';
 import { useConfirm } from '../components/ConfirmModal';
 
@@ -44,9 +44,7 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
 
   // Clear parent edit state after consuming
   useEffect(() => {
-    if (consumed.current && clearEditBlog) {
-      clearEditBlog();
-    }
+    if (consumed.current && clearEditBlog) clearEditBlog();
   }, []);
 
   // Track unsaved changes for beforeunload
@@ -75,24 +73,76 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
     return true;
   };
 
-  // Sync blogs from Firestore
+
+
+  // Sync blogs from Firestore — dual strategy for network resilience
   const [blogs, setBlogs] = useState([]);
   const [blogsLoaded, setBlogsLoaded] = useState(false);
-  useEffect(() => {
-    if (!db) { setBlogsLoaded(true); return; }
-    const blogsRef = collection(db, 'artifacts', appId, 'public', 'data', 'blogs');
-    const unsubscribe = onSnapshot(query(blogsRef), (snap) => {
-      const docs = snap.docs.map(d => {
-        const data = d.data();
-        let dateStr = "Recent";
-        if (data.date) dateStr = data.date;
-        else if (data.createdAt?.toDate) dateStr = data.createdAt.toDate().toLocaleDateString('en-GB');
-        return { id: d.id, ...data, date: dateStr };
-      });
-      setBlogs(docs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)));
+  const [loadError, setLoadError] = useState(false);
+
+  const parseDocs = (docs) => {
+    return docs.map(d => {
+      const data = typeof d.data === 'function' ? d.data() : d;
+      const id = d.id || data.id;
+      let dateStr = "Recent";
+      if (data.date) dateStr = data.date;
+      else if (data.createdAt?.toDate) dateStr = data.createdAt.toDate().toLocaleDateString('en-GB');
+      return { id, ...data, date: dateStr };
+    }).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  };
+
+  const loadBlogs = () => {
+    if (!db) {
       setBlogsLoaded(true);
+      setLoadError(true);
+      return () => { };
+    }
+
+    setBlogsLoaded(false);
+    setLoadError(false);
+
+    const blogsRef = collection(db, 'artifacts', appId, 'public', 'data', 'blogs');
+    let resolved = false;
+
+    // Strategy 1: Real-time listener (WebSocket)
+    const unsubscribe = onSnapshot(query(blogsRef), (snap) => {
+      resolved = true;
+      setLoadError(false);
+      setBlogs(parseDocs(snap.docs));
+      setBlogsLoaded(true);
+    }, (err) => {
+      console.error('[Journal] onSnapshot error:', err);
+      // Don't set error yet — getDocs fallback may save us
     });
-    return () => unsubscribe();
+
+    // Strategy 2: One-shot HTTP fallback after 5s if WS hasn't connected
+    const fallbackTimer = setTimeout(async () => {
+      if (!resolved) {
+        try {
+          console.log('[Journal] onSnapshot slow, trying getDocs fallback...');
+          const snap = await getDocs(query(blogsRef));
+          if (!resolved) {
+            setBlogs(parseDocs(snap.docs));
+            setBlogsLoaded(true);
+            setLoadError(false);
+            resolved = true;
+          }
+        } catch (err) {
+          console.error('[Journal] getDocs fallback error:', err);
+          if (!resolved) {
+            setBlogsLoaded(true);
+            setLoadError(true);
+          }
+        }
+      }
+    }, 5000);
+
+    return () => { unsubscribe(); clearTimeout(fallbackTimer); };
+  };
+
+  useEffect(() => {
+    const cleanup = loadBlogs();
+    return cleanup;
   }, []);
 
   const themeColors = {
@@ -102,17 +152,16 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
   };
 
   // Build display list based on filter
-  const allFromFirestore = blogs;
   const publicBlogs = blogs.filter(b => !b.archived);
   const archivedBlogs = blogs.filter(b => b.archived);
 
   let displayBlogs;
   if (!isAdmin || filterMode === 'public') {
-    displayBlogs = [...publicBlogs, ...STATIC_BLOGS];
+    displayBlogs = publicBlogs;
   } else if (filterMode === 'archived') {
     displayBlogs = archivedBlogs;
   } else {
-    displayBlogs = [...allFromFirestore, ...STATIC_BLOGS];
+    displayBlogs = blogs;
   }
 
   // Save handler
@@ -130,7 +179,7 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
         readTime: `${Math.max(1, Math.ceil(newBlog.content.split(' ').length / 200))} MIN`,
       };
 
-      if (editingId && !editingId.startsWith('s')) {
+      if (editingId) {
         await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', editingId), { ...blogData, updatedAt: serverTimestamp() });
       } else {
         blogData.date = new Date().toLocaleDateString('en-GB', { month: '2-digit', year: 'numeric' }).replace('/', ' · ');
@@ -148,7 +197,7 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
   };
 
   const toggleArchive = async (blog) => {
-    if (!db || blog.id?.startsWith('s')) return;
+    if (!db) return;
     try {
       await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', blog.id), { archived: !blog.archived });
     } catch (err) {
@@ -191,18 +240,21 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
             </div>
             {isAdmin && (
               <div className="flex gap-2 items-center">
-                {/* Clear 3-way filter toggle */}
                 <div className={`flex rounded-full border border-black/10 dark:border-white/10 overflow-hidden ${UI.mono} text-[10px]`}>
-                  {['public', 'all', 'archived'].map(mode => (
+                  {[
+                    { key: 'public', label: 'LIVE' },
+                    { key: 'all', label: 'ALL' },
+                    { key: 'archived', label: 'ARCHIVED' },
+                  ].map(({ key, label }) => (
                     <button
-                      key={mode}
-                      onClick={() => setFilterMode(mode)}
-                      className={`px-3 py-1.5 transition-colors ${filterMode === mode
-                        ? (mode === 'archived' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-black/10 dark:bg-white/10 text-black dark:text-white')
+                      key={key}
+                      onClick={() => setFilterMode(key)}
+                      className={`px-3 py-1.5 transition-colors ${filterMode === key
+                        ? (key === 'archived' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-black/10 dark:bg-white/10 text-black dark:text-white')
                         : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'
                         }`}
                     >
-                      {mode === 'public' ? 'LIVE' : mode === 'all' ? 'ALL' : '📦'}
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -215,6 +267,18 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
             {!blogsLoaded ? (
               <div className="flex flex-col gap-4 animate-pulse">
                 {[1, 2, 3].map(i => <div key={i} className="h-16 bg-black/[0.03] dark:bg-white/[0.03] rounded-xl" />)}
+              </div>
+            ) : loadError ? (
+              <div className={`text-center py-16 glass-texture border border-black/5 dark:border-white/10 rounded-2xl p-8`}>
+                <p className={`font-serif text-[1.1rem] ${themeColors.textSub} leading-relaxed`}>
+                  The garden is resting for a moment.
+                </p>
+                <p className={`font-sans text-sm text-zinc-400 mt-2`}>
+                  Posts should be back shortly.
+                </p>
+                <button onClick={loadBlogs} className={`mt-4 inline-flex items-center gap-2 font-sans text-sm text-zinc-500 hover:text-black dark:hover:text-white transition-colors`}>
+                  <RefreshCcw className="w-3.5 h-3.5" /> Try again
+                </button>
               </div>
             ) : displayBlogs.length === 0 ? (
               <p className={`text-center py-16 ${themeColors.textSub} ${UI.sans}`}>
@@ -230,7 +294,7 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
                   >
                     <div className="flex items-center gap-2 w-full">
                       <h4 className={`font-serif md:text-[1.5rem] text-[1.3rem] leading-tight ${themeColors.textMain} group-hover:opacity-60 transition-opacity flex-1`}>{blog.title}</h4>
-                      {isAdmin && !blog.id?.startsWith('s') && (
+                      {isAdmin && (
                         <button
                           onClick={(e) => { e.stopPropagation(); toggleArchive(blog); }}
                           title={blog.archived ? "Make live" : "Archive"}

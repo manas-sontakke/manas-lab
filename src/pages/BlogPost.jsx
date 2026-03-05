@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, deleteDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../services/firebase';
-import { UI, STATIC_BLOGS } from '../utils/constants';
+import { UI } from '../utils/constants';
 import { ArrowLeft, Clock, Trash2, Edit2, ArrowUp, Archive, Eye } from 'lucide-react';
 import { useConfirm } from '../components/ConfirmModal';
 
@@ -31,15 +31,8 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors, onEditBlog 
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // Fetch blog data — check static first, then Firestore
+    // Fetch blog data from Firestore
     useEffect(() => {
-        const staticMatch = STATIC_BLOGS.find(b => b.id === id);
-        if (staticMatch) {
-            setBlog(staticMatch);
-            setLoading(false);
-            return;
-        }
-
         if (!db) { setLoading(false); return; }
 
         const blogRef = doc(db, 'artifacts', appId, 'public', 'data', 'blogs', id);
@@ -82,7 +75,7 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors, onEditBlog 
     };
 
     const handleArchive = async () => {
-        if (!db || !isAdmin || blog.id?.startsWith('s')) return;
+        if (!db || !isAdmin) return;
         try {
             await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', id), { archived: !blog.archived });
         } catch (err) {
@@ -170,7 +163,7 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors, onEditBlog 
                             >
                                 <Edit2 className="w-3.5 h-3.5" /> Edit
                             </button>
-                            {!blog.id?.startsWith('s') && (
+                            {(
                                 <button
                                     onClick={handleArchive}
                                     className={`flex items-center gap-1.5 font-sans text-sm transition-colors ${blog.archived ? 'text-amber-500 hover:text-amber-600' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}

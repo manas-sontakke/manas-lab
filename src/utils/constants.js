@@ -13,14 +13,3 @@ export const UI = {
   // Specific blocks
   label: 'text-xs md:text-sm font-medium tracking-wide uppercase font-sans',
 };
-
-export const STATIC_BLOGS = [
-  {
-    id: 's1',
-    title: "Life at IIT Kanpur: Systems & Serenity",
-    date: "03 · 2026",
-    readTime: "5 MIN",
-    excerpt: "Between the demanding systems architecture courses and peaceful evening walks on the airstrip, life here is a study in contrasts.",
-    content: "IIT Kanpur isn't just an institute; it's an ecosystem. The demands of high-performance engineering are perfectly counterbalanced by the quiet, sprawling green campus.\n\nHere, a digital garden makes sense. It's a place to synthesize the chaos of learning into something structured, beautiful, and enduring."
-  }
-];
