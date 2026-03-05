@@ -8,7 +8,7 @@ import { useGlobalContent } from '../contexts/GlobalContentContext';
 import { useConfirm } from '../components/ConfirmModal';
 
 export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBlog }) {
-  const { content } = useGlobalContent();
+  const { content, authReady } = useGlobalContent();
   const navigate = useNavigate();
   const confirm = useConfirm();
 
@@ -141,9 +141,10 @@ export default function Journal({ isAdmin, isDarkMode, editBlogData, clearEditBl
   };
 
   useEffect(() => {
+    if (!authReady) return;
     const cleanup = loadBlogs();
     return cleanup;
-  }, []);
+  }, [authReady]);
 
   const themeColors = {
     textMain: isDarkMode ? 'text-[#EDEDED]' : 'text-[#232323]',

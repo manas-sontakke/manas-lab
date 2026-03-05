@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { doc, onSnapshot, setDoc, serverTimestamp } from 'firebase/firestore';
-import { db, appId } from '../services/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { db, auth, appId } from '../services/firebase';
 
 const GlobalContentContext = createContext();
 
@@ -30,26 +31,42 @@ const defaultContent = {
 export function GlobalContentProvider({ children }) {
     const [content, setContent] = useState(defaultContent);
     const [loading, setLoading] = useState(true);
+    const [authReady, setAuthReady] = useState(false);
 
+    // Wait for Firebase auth to be ready before trying Firestore
     useEffect(() => {
-        if (!db) return;
+        if (!auth) { setAuthReady(true); setLoading(false); return; }
+        const unsub = onAuthStateChanged(auth, () => {
+            setAuthReady(true);
+        });
+        // Timeout fallback: if auth never resolves in 4s, proceed with defaults
+        const timer = setTimeout(() => { setAuthReady(true); }, 4000);
+        return () => { unsub(); clearTimeout(timer); };
+    }, []);
+
+    // Only connect to Firestore AFTER auth is ready
+    useEffect(() => {
+        if (!authReady || !db) {
+            if (authReady) setLoading(false);
+            return;
+        }
         const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'main');
 
         const unsubscribe = onSnapshot(settingsRef, (docSnap) => {
             if (docSnap.exists()) {
                 setContent({ ...defaultContent, ...docSnap.data() });
             } else {
-                // Initialize doc if it doesn't exist
                 setDoc(settingsRef, { ...defaultContent, createdAt: serverTimestamp() }).catch(console.error);
             }
             setLoading(false);
         }, (error) => {
-            console.error("[GlobalContent] Error fetching settings:", error);
+            console.error("[GlobalContent] Firestore error:", error);
+            // Fall back to defaults instead of hanging forever
             setLoading(false);
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [authReady]);
 
     const loadingLines = [
         "brewing some thoughts...",
@@ -62,7 +79,7 @@ export function GlobalContentProvider({ children }) {
     const [loadingLine] = useState(() => loadingLines[Math.floor(Math.random() * loadingLines.length)]);
 
     return (
-        <GlobalContentContext.Provider value={{ content, loading }}>
+        <GlobalContentContext.Provider value={{ content, loading, authReady }}>
             {loading ? (
                 <div className="min-h-screen flex flex-col items-center justify-center bg-[#F4F1EA] dark:bg-[#151515] transition-opacity duration-500">
                     <div className="flex flex-col items-center gap-6 animate-in fade-in duration-700">
