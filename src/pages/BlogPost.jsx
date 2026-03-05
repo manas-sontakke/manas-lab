@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { doc, getDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { db, appId } from '../services/firebase';
 import { UI, STATIC_BLOGS } from '../utils/constants';
-import { ArrowLeft, Clock, Trash2, Edit2, ArrowUp } from 'lucide-react';
+import { ArrowLeft, Clock, Trash2, Edit2, ArrowUp, Archive, Eye } from 'lucide-react';
+import { useConfirm } from '../components/ConfirmModal';
 
 export default function BlogPost({ isAdmin, isDarkMode, themeColors, onEditBlog }) {
     const { id } = useParams();
     const navigate = useNavigate();
+    const confirm = useConfirm();
     const [blog, setBlog] = useState(null);
     const [loading, setLoading] = useState(true);
     const [readProgress, setReadProgress] = useState(0);
@@ -59,7 +61,13 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors, onEditBlog 
 
     const handleDelete = async () => {
         if (!db || !isAdmin) return;
-        if (!window.confirm('Delete this post?')) return;
+        const yes = await confirm({
+            message: 'Delete this post?',
+            subtext: 'This action cannot be undone.',
+            confirmLabel: 'Delete',
+            cancelLabel: 'Keep it',
+        });
+        if (!yes) return;
         try {
             await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', id));
             navigate('/');
@@ -71,6 +79,15 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors, onEditBlog 
     const handleEdit = () => {
         onEditBlog(blog);
         navigate('/');
+    };
+
+    const handleArchive = async () => {
+        if (!db || !isAdmin || blog.id?.startsWith('s')) return;
+        try {
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'blogs', id), { archived: !blog.archived });
+        } catch (err) {
+            console.error('[BlogPost] Archive error:', err);
+        }
     };
 
     if (loading) {
@@ -153,6 +170,14 @@ export default function BlogPost({ isAdmin, isDarkMode, themeColors, onEditBlog 
                             >
                                 <Edit2 className="w-3.5 h-3.5" /> Edit
                             </button>
+                            {!blog.id?.startsWith('s') && (
+                                <button
+                                    onClick={handleArchive}
+                                    className={`flex items-center gap-1.5 font-sans text-sm transition-colors ${blog.archived ? 'text-amber-500 hover:text-amber-600' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'}`}
+                                >
+                                    {blog.archived ? <><Eye className="w-3.5 h-3.5" /> Unarchive</> : <><Archive className="w-3.5 h-3.5" /> Archive</>}
+                                </button>
+                            )}
                             <button
                                 onClick={handleDelete}
                                 className="flex items-center gap-1.5 font-sans text-sm text-red-400 hover:text-red-600 transition-colors"

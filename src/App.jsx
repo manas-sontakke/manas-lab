@@ -9,6 +9,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import BlogPost from './pages/BlogPost';
 import ProjectDetail from './pages/ProjectDetail';
 import { GlobalContentProvider, useGlobalContent } from './contexts/GlobalContentContext';
+import { ConfirmProvider, useConfirm } from './components/ConfirmModal';
 import {
   Sun, Moon, X, AlertCircle, RefreshCcw, Lock,
   Instagram, Twitter, Mail, Phone, Linkedin, Github, Code2, Cpu, Terminal
@@ -78,9 +79,9 @@ function App() {
     const navigate = useNavigate();
     const location = useLocation();
     const scrollPositions = useRef({});
-    const [transitionKey, setTransitionKey] = useState(location.key);
     const [transitionClass, setTransitionClass] = useState('page-transition-active');
     const [editBlogData, setEditBlogData] = useState(null);
+    const confirm = useConfirm();
 
     // Smooth page transition
     useEffect(() => {
@@ -103,9 +104,24 @@ function App() {
         }
       }
 
-      setTransitionKey(location.key);
       return () => cancelAnimationFrame(timer);
     }, [location.pathname, location.key]);
+
+    // Guarded tab navigation — custom themed modal in admin mode
+    const guardedNavTo = async (targetView) => {
+      if (targetView === view) return;
+      if (isAdmin) {
+        const yes = await confirm({
+          message: 'Switch tabs?',
+          subtext: 'Any unsaved changes in your current view won\'t be kept.',
+          confirmLabel: 'Switch',
+          cancelLabel: 'Stay here',
+        });
+        if (!yes) return;
+      }
+      setView(targetView);
+      navigate('/');
+    };
 
     return (
       <div className={`min-h-screen transition-colors duration-500 font-sans ${themeColors.bg} ${themeColors.textMain} selection:bg-black selection:text-white ${isDarkMode ? 'dark' : ''} overflow-x-hidden`}>
@@ -141,8 +157,14 @@ function App() {
         {/* Global Admin Indicator / Exit Button */}
         {isAdmin && (
           <button
-            onClick={() => {
-              if (!window.confirm('All saved changes will persist. Are you sure you want to leave the garden?')) return;
+            onClick={async () => {
+              const yes = await confirm({
+                message: 'Leaving the garden?',
+                subtext: 'All saved changes will persist. You can always come back.',
+                confirmLabel: 'Leave',
+                cancelLabel: 'Stay',
+              });
+              if (!yes) return;
               signOut(auth).then(() => { setIsAdmin(false); setView('journal'); });
             }}
             className="fixed bottom-6 left-6 z-[9999] flex items-center gap-3 px-5 py-2.5 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 border border-red-500/20 backdrop-blur-md shadow-lg group"
@@ -167,20 +189,20 @@ function App() {
         <div className="relative max-w-[640px] mx-auto px-6 py-16 md:py-24">
           <nav className={`flex justify-between items-center mb-20 gap-2 md:gap-4 z-50 transition-all px-3 md:px-6 py-3 md:py-4 rounded-2xl border shadow-sm glass-texture ${isDarkMode ? 'border-white/10' : 'border-black/5'} overflow-hidden`}>
             <div className="cursor-pointer select-none shrink-0">
-              <span className={`font-sans font-semibold text-base md:text-lg tracking-tight`} onClick={() => { setView('journal'); navigate('/'); }}>Manas Sontakke</span>
+              <span className={`font-sans font-semibold text-base md:text-lg tracking-tight`} onClick={() => guardedNavTo('journal')}>Manas Sontakke</span>
             </div>
             <div className="flex items-center gap-2 md:gap-6 relative z-10 shrink-0">
               <div className={`flex gap-2 md:gap-4`}>
                 {isAdmin && (
-                  <button onClick={() => { setView('dashboard'); navigate('/'); }} className={`${UI.label} transition-colors hidden md:block ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Dashboard</button>
+                  <button onClick={() => guardedNavTo('dashboard')} className={`${UI.label} transition-colors hidden md:block ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>Dashboard</button>
                 )}
                 {isAdmin && (
-                  <button onClick={() => { setView('dashboard'); navigate('/'); }} className={`md:hidden ${UI.label} transition-colors ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>
+                  <button onClick={() => guardedNavTo('dashboard')} className={`md:hidden ${UI.label} transition-colors ${view === 'dashboard' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white'}`}>
                     <Terminal className="w-4 h-4" />
                   </button>
                 )}
-                <button onClick={() => { setView('journal'); navigate('/'); }} className={`${UI.label} transition-colors ${view === 'journal' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Indoor</button>
-                <button onClick={() => { setView('profile'); navigate('/'); }} className={`${UI.label} transition-colors ${view === 'profile' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Outdoor</button>
+                <button onClick={() => guardedNavTo('journal')} className={`${UI.label} transition-colors ${view === 'journal' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Indoor</button>
+                <button onClick={() => guardedNavTo('profile')} className={`${UI.label} transition-colors ${view === 'profile' ? themeColors.textMain : 'text-zinc-400 hover:text-black dark:hover:text-white uppercase'}`}>Outdoor</button>
               </div>
               <div className="w-px h-4 bg-zinc-300 dark:bg-zinc-800"></div>
               <button
@@ -195,7 +217,7 @@ function App() {
             </div>
           </nav>
 
-          <div key={transitionKey} className={transitionClass}>
+          <div className={transitionClass}>
             <Routes location={location}>
               <Route path="/post/:id" element={
                 <main className="w-full min-h-[50vh]">
@@ -289,7 +311,9 @@ function App() {
 
   return (
     <GlobalContentProvider>
-      <InnerApp />
+      <ConfirmProvider isDarkMode={isDarkMode}>
+        <InnerApp />
+      </ConfirmProvider>
     </GlobalContentProvider>
   );
 }
